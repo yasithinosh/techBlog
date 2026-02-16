@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/3d19ed581b7a4490874727c34a8021bb",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidUXFHb5xxhU1l3nRPo7Yj4NExy0fNdXF_1ZRalMvPI3XT3dZa6NyFUOCYcy8SQvUHxI_7wZzd3I8rsin45nmHs72WH7R1cuzgcgk5BaUDHjvBOgSGPB8hiEESfyWAvlMvsqhEJpfsUn621virittSmp6rBHSqNKG8JY6_pk8hZA0URtWvwRnE7pCQYzjYtPq5i_GF-hmfrnllJdDYGCOXpXIYUCJb-qNFr8ldsAdddy-jP_rW_F7iWCeAgs"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/9f3e2070e02a438fadc6b7a050067ef1",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2ZiZGFiZWM1MjUzMTRiNjBiYTJhZWIxNDY4MDg3ZDRiEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "1922137fe8884b3895a9ecd3866eee35",
+  "generatedBy": "figaro_agent",
+  "width": "2560",
+  "height": "2484",
+  "title": "Technical Blog Feed Dashboard",
+  "prompt": "Title: Technical Blog Feed Dashboard\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: The main dashboard for logged-in users. It shows a feed of technical blog posts. Each post card displays the title, author, a snippet of text, and interaction buttons for React (like), Comment, and Share. There is a prominent 'Create Post' button in the header or sidebar. Desktop layout with a sidebar for categories like 'Trending', 'Latest', and 'My Feed'.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/1922137fe8884b3895a9ecd3866eee35",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/ff35a2defa874eab926801a53dd6143b",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidWYPJok-HeYrixSx-_ggeqrgAXUk12Ou4mXilhwKTH4OQzwFGkDDrZ4XACXdftANGUFiFI8DozPAuo3v4KgDJBJq9itrhk-Vf0u1tAmSNLPT_DL_IMMrEGpgBW2jl_leGLDka656Tor5rBMffxI88XztGkdZ-dHF7B0mKa-SLBgjxMB8snKcoc10zn0jCJVtqxtPCuAMqlqpO9ZYGYuTLyoig1kPjhLd7ACi-PuCsMx-IeoUp59qSsK8OnD"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/506b408200e7493882b9ef8a3d2da5a2",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzBiYzA5ZjZhNWU5MTRiZGE5Y2E3MmIxY2VjNzg0NGMyEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "a80b1b12bab0488d88f3d37f507b004e",
+  "generatedBy": "figaro_agent",
+  "width": "2560",
+  "height": "2048",
+  "title": "User Profile Settings",
+  "prompt": "Title: User Profile Settings\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: User profile page where users can view and edit their information. Includes sections for Profile Picture, Name, Nickname, and Bio. It also lists the user's published posts. The design is clean with a 'Save Changes' button.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/a80b1b12bab0488d88f3d37f507b004e",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}

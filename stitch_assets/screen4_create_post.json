@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/31fc207f965941868cc505210e9d250c",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidVkd3fN_PPQkxG9qOS71ILCjSTwY9iyaXmNS6FtCcWkvHD-eSUEfN1nYs_nqRL2cblSz2oQT4CNgMN0xkSDNwb-Pkhtd0AFiPBvzBJIeNgCFhvHi2LDWypGT7WCMFW75J8q0qAYhjWbOhY6RBtAzXwquHHQ6zv6yn4BTWYtxx8Vr_Cd8hBOcqhdPIN7bX-BNzlGlzuhaq-Swg8AhoFdEiZnvu0DYCTsNpyDuotBSZSMuPTp_WEpH8QpJMo"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/ce8c020fb35248ad9aae84a6b17d5bc4",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2U0YzM2Y2ZlN2I3NDRhN2NhNDQxZWRmMmExZGZmYmFiEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "c4cdcac8bf1b417095f280aac368cb68",
+  "generatedBy": "figaro_agent",
+  "width": "2560",
+  "height": "2470",
+  "title": "Create New Blog Post",
+  "prompt": "Title: Create New Blog Post\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: A dedicated screen for creating a new technical blog post. It includes a rich text editor for the content, a field for the title, a tag input for technical topics (e.g., React, Python, AI), and an image uploader for a cover photo. Buttons for 'Publish' and 'Save Draft'.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/c4cdcac8bf1b417095f280aac368cb68",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}

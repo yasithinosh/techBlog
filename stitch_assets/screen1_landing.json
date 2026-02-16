@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/4e3c54610338498bb26607c2ee1c6b70",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidXxpf8mmm3DbPzgXNbcHiQmKHHY0W5nkLlFORFcOeoFFotDf6XRKyvZ9eVOAzKVs85Y56thfR10Cz45L88NXk56Oe1R_52wd8qJcJPlWjLFhK4Q18MD9HpOnjnmazToMDji9waAbTIyVwaPpk2Ywk7ONRRdBPpGYtcXIlRVv1Ut8wtN-TIFBEgAh8kzKqUDGQ-C03qoJc7LhIYeRuJ0eKVEhr3gTM9JmNgekLD9e6HsozwfobFT0RwQn9XY"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/edaed74fa44743f985a8a8cd2ecf3e75",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzNkYjI3OThjYTQxYjQ1Yjk4MDNmZjc5ZGVhOGEyNmQxEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "e5db45f38a454635a078cc38afb76e89",
+  "generatedBy": "figaro_agent",
+  "width": "2560",
+  "height": "6730",
+  "title": "Inovoid Landing Page",
+  "prompt": "Title: Inovoid Landing Page\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: The landing page for 'inovoid'. It features a hero section explaining that it is a platform for technical post sharing. It includes prominent 'Get Started' and 'Login' buttons. Below the hero, there's a section titled 'Why inovoid?' highlighting features like community sharing and technical deep-dives. The footer includes the copyright notice '© inovoid'. The theme is professional and clean.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/e5db45f38a454635a078cc38afb76e89",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}

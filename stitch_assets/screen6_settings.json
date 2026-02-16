@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/a9a7e0884e09414b8c974472cd4b7fd6",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidWOBblbCpchj6_ue7dkp8PwKhFyRgV6KklOh_f0B0cN1GPvLYnbyN4aNrKsdCUELJcrb6EkQ0cI1n8BsiBXOBqW0Tn41DtyhHHioELkbyNbKM_5yipMDIpPl6Gj4PAEvZoJrlaNL5_2aHymxKJsAzQkxG86JOVX6ne_NzqS_p10PcV_4sC5YbyZH6UrOrEyF_Cc5ycnN-1XWJZZ_hbDQkVCYL-7g1yahFBObzmD9shXy2MZVUznJRew1Yg"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/4e7b60e3d3674834bedea648c708e57b",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sX2Y5ZWU1NDdkNGU1YTRlYmZiNTIwMWJkYmQwMTcwYzYyEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "78c7220b5e1d4ae8b35b2ad761a987ca",
+  "generatedBy": "figaro_agent",
+  "width": "2560",
+  "height": "3166",
+  "title": "Account and Privacy Settings",
+  "prompt": "Title: Account and Privacy Settings\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: The account settings page. It includes sections for 'Security' (Change Password) and 'Privacy' (Profile visibility, data sharing). It also features a 'Theme Toggle' to switch between Light and Dark modes. Professional layout with clear headings.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/78c7220b5e1d4ae8b35b2ad761a987ca",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}

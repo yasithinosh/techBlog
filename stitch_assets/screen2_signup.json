@@ -1,0 +1,30 @@
+{
+  "screenshot": {
+    "name": "projects/11715595592708548092/files/d6e56983e5ad40dcb303f84f2851474f",
+    "downloadUrl": "https://lh3.googleusercontent.com/aida/AOfcidXB5bi3HNt6CJwJ5mecNU1IxI9UZo5v5WhkSNklNopARCbnNnnD7TSjF67vohrZQcofgs9kbXeQPqFjrM72u9rwP2a4CoO-PfoFVtnt24v35rzqdKaHqFjID3xOYAWJdtZ4oMkHA5eXTILzk9udHqMvujwMaRPtflIWTX-ixu4WCkphmppVrg_un4IuFIqzCVWfkvNQ-HudEcD1HGuP31InydiZYvDlhO-Qy3X6eag15oawWYVL4I0llK4"
+  },
+  "htmlCode": {
+    "name": "projects/11715595592708548092/files/f93758758b1746b08e2ebc07eafddd2b",
+    "downloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ8Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpbCiVodG1sXzEzZThiMDc5MTc1NjQ5NDBhZDFhODEyMmRiZGI2YTkwEgsSBxClwb_e2wQYAZIBJAoKcHJvamVjdF9pZBIWQhQxMTcxNTU5NTU5MjcwODU0ODA5Mg&filename=&opi=89354086"
+  },
+  "id": "fdcb0b069d6941a38ae81c052496f03f",
+  "generatedBy": "figaro_agent",
+  "width": "2720",
+  "height": "2048",
+  "title": "User Signup and Verification",
+  "prompt": "Title: User Signup and Verification\nContext: A technical blog platform named 'inovoid' for sharing and interacting with tech posts.\nDescription of the screen: A signup page with fields for Name, Email, and Password. It includes a clear 'Sign Up' button and a link to the login page. After clicking sign up, a mock-up overlay or state shows an 'Email Verification' prompt asking the user to check their inbox. Modern, tech-focused design.\nPlatform: web\nForm factor: desktop",
+  "name": "projects/11715595592708548092/screens/fdcb0b069d6941a38ae81c052496f03f",
+  "theme": {
+    "colorMode": "DARK",
+    "font": "SPACE_GROTESK",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#137fec",
+    "saturation": 2
+  },
+  "deviceType": "DESKTOP",
+  "screenType": "DESIGN",
+  "screenMetadata": {
+    "agentType": "PRO_AGENT",
+    "status": "COMPLETE"
+  }
+}
