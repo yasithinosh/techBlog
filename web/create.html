@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Create New Blog Post | inovoid</title>
+    <script>
+        if (localStorage.getItem('inovoid-theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .editor-content:empty:before {
+            content: attr(data-placeholder);
+            color: #4b5563;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.4s ease-out both;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
+
+    <!-- Header Navigation -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-icons-round text-white text-lg">bolt</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">inovoid</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-2 text-slate-500 text-sm">
+                    <span class="material-icons-round text-sm">chevron_right</span>
+                    <a class="hover:text-primary transition-colors" href="feed.html">Dashboard</a>
+                    <span class="material-icons-round text-sm">chevron_right</span>
+                    <span class="text-slate-800 dark:text-slate-200 font-medium">Create Post</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    title="Toggle theme">
+                    <span class="material-icons-round text-sm" id="theme-icon">light_mode</span>
+                </button>
+                <span class="hidden md:block text-xs text-slate-500 italic">Changes saved 2 mins ago</span>
+                <button
+                    class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                    Preview
+                </button>
+                <button
+                    class="px-4 py-2 text-sm font-medium rounded-lg bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">
+                    Save Draft
+                </button>
+                <button
+                    class="px-6 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Publish
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+        <!-- Cover Image Upload -->
+        <div class="relative group mb-8">
+            <div
+                class="w-full h-64 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all overflow-hidden">
+                <img alt="Cover preview"
+                    class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaXbszk7LKUJmsB_XZe4o0kvx78hl8cWD_CZ_gNAdAoN-J9OR39kBlfhVu4v-C3hefuGG-TLadkVG8kZDLTWKbEcJueb3Sw2qpcvGAoJlasax3pHZ9WpqDLpi-KmxVVR4eBI5pirkHSl-bEhyEPKeNPJblMWj01js9-Rw63WVtxDdd6B9oGRwERd_mXwa5AhFoBFszzxTQgqxUUJvCOe88jR1t28p-MwyF4vSNM2S1mcKvksCAIRs59U_Jy4RmwQGmxr3rX_yjxX7L" />
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                        <span class="material-icons-round text-primary">add_photo_alternate</span>
+                    </div>
+                    <p class="font-medium text-slate-700 dark:text-slate-300">Add a high-quality cover image</p>
+                    <p class="text-xs text-slate-500 mt-1">1600 x 840 recommended (PNG, JPG, WebP)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Title Input -->
+        <div class="mb-6">
+            <textarea
+                class="w-full bg-transparent border-none focus:ring-0 text-4xl md:text-5xl font-bold placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none p-0 overflow-hidden"
+                oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                placeholder="Enter a catchy tech title..." rows="1"></textarea>
+        </div>
+
+        <!-- Tags Input -->
+        <div
+            class="mb-10 flex flex-wrap items-center gap-2 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div
+                class="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
+                <span>#react</span>
+                <button class="material-icons-round text-sm hover:text-red-400">close</button>
+            </div>
+            <div
+                class="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
+                <span>#webdev</span>
+                <button class="material-icons-round text-sm hover:text-red-400">close</button>
+            </div>
+            <div
+                class="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
+                <span>#ai</span>
+                <button class="material-icons-round text-sm hover:text-red-400">close</button>
+            </div>
+            <input
+                class="bg-transparent border-none focus:ring-0 text-sm flex-grow min-w-[200px] text-slate-600 dark:text-slate-400"
+                placeholder="Add technical tags (e.g. Python, Docker)..." type="text" />
+        </div>
+
+        <!-- Editor Toolbar -->
+        <div
+            class="sticky top-20 z-40 mb-6 flex items-center justify-between p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl shadow-black/5">
+            <div class="flex items-center space-x-1">
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Bold">
+                    <span class="material-icons-round text-xl">format_bold</span>
+                </button>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Italic">
+                    <span class="material-icons-round text-xl">format_italic</span>
+                </button>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Heading">
+                    <span class="material-icons-round text-xl">title</span>
+                </button>
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Link">
+                    <span class="material-icons-round text-xl">link</span>
+                </button>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Quote">
+                    <span class="material-icons-round text-xl">format_quote</span>
+                </button>
+                <button class="p-2 bg-primary/10 text-primary rounded-lg transition-colors" title="Code Block">
+                    <span class="material-icons-round text-xl">code</span>
+                </button>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Image">
+                    <span class="material-icons-round text-xl">insert_photo</span>
+                </button>
+            </div>
+            <div class="flex items-center space-x-4 px-2">
+                <span class="text-xs text-slate-500 font-medium hidden sm:inline">Markdown Supported</span>
+                <button
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400">
+                    <span class="material-icons-round text-xl">fullscreen</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor Body -->
+        <div class="min-h-[500px] mb-12">
+            <div class="editor-content outline-none text-lg leading-relaxed text-slate-700 dark:text-slate-300 prose dark:prose-invert max-w-none"
+                contenteditable="true" data-placeholder="Write your technical masterpiece here...">
+                <p>Starting your project with React can be daunting. In this guide, we'll explore the latest best
+                    practices for 2024...</p>
+                <br />
+                <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm border border-slate-800 my-6"><span class="text-primary">function</span> <span class="text-yellow-400">inovoidApp</span>() {
+  <span class="text-primary">return</span> (
+    <span class="text-emerald-400">&lt;div&gt;Welcome to the future&lt;/div&gt;</span>
+  );
+}</pre>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Stats Bar -->
+    <div
+        class="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 h-12 flex items-center justify-between text-xs font-medium text-slate-500">
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-1">
+                    <span class="material-icons-round text-sm">article</span>
+                    <span>428 Words</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="material-icons-round text-sm">timer</span>
+                    <span>3 Min Read</span>
+                </div>
+                <div class="flex items-center space-x-1 text-emerald-500">
+                    <span class="material-icons-round text-sm">cloud_done</span>
+                    <span>Autosaved</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="flex items-center space-x-1 hover:text-primary transition-colors">
+                    <span class="material-icons-round text-sm">help_outline</span>
+                    <span class="hidden sm:inline">Editor Help</span>
+                </button>
+                <button class="flex items-center space-x-1 hover:text-primary transition-colors">
+                    <span class="material-icons-round text-sm">settings</span>
+                    <span class="hidden sm:inline">Post Settings</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Decorations -->
+    <div class="fixed top-0 left-0 -z-10 w-full h-full overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-primary/5 blur-[100px] rounded-full"></div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('inovoid-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+        }
+        updateThemeIcon();
+    </script>
+</body>
+
+</html>
