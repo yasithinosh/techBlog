@@ -1,0 +1,7 @@
+# Environment & credentials
+.env
+js/config.js
+
+# OS files
+.DS_Store
+Thumbs.db

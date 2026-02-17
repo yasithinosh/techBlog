@@ -1,12 +1,12 @@
 // ============================================
 // INOVOID — Supabase Client Initialization
 // ============================================
-// IMPORTANT: Replace these with your actual Supabase credentials
-// Find them at: Supabase Dashboard → Settings → API
+// Credentials are loaded from js/config.js (APP_CONFIG)
+// Make sure config.js is loaded BEFORE this file in HTML
 // ============================================
 
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';        // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // e.g. eyJhbGciOi...
+const SUPABASE_URL = APP_CONFIG.SUPABASE_URL;
+const SUPABASE_ANON_KEY = APP_CONFIG.SUPABASE_ANON_KEY;
 
 // Initialize Supabase client (loaded via CDN in HTML)
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
