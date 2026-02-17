@@ -2,6 +2,14 @@
 // INOVOID — Auth Guards & Session Management
 // ============================================
 
+// Helper: detect whether we're in /pages/ subfolder
+function getBasePath() {
+    return window.location.pathname.includes('/pages/') ? '../' : '';
+}
+function getPagesPath() {
+    return window.location.pathname.includes('/pages/') ? '' : 'pages/';
+}
+
 // Get current session
 async function getSession() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -18,17 +26,17 @@ async function getCurrentUser() {
 async function requireAuth() {
     const user = await getCurrentUser();
     if (!user) {
-        window.location.href = 'login.html';
+        window.location.href = getPagesPath() + 'login.html';
         return null;
     }
     return user;
 }
 
 // Redirect if already logged in (for login/signup pages)
-async function redirectIfLoggedIn(destination = 'feed.html') {
+async function redirectIfLoggedIn() {
     const user = await getCurrentUser();
     if (user) {
-        window.location.href = destination;
+        window.location.href = 'feed.html';
     }
 }
 
@@ -59,7 +67,7 @@ async function signIn(email, password) {
 // Sign out
 async function signOut() {
     await supabase.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.href = getBasePath() + 'index.html';
 }
 
 // Update password

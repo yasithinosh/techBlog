@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
     <title>Account Settings | inovoid</title>
+    <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
@@ -21,39 +23,6 @@
             },
         }
     </script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.4s ease-out both;
-        }
-
-        .toggle-checkbox:checked {
-            background-color: #137fec;
-        }
-
-        .toggle-checkbox:checked+.toggle-label {
-            background-color: #137fec;
-        }
-
-        .toggle-checkbox:checked+.toggle-label .toggle-dot {
-            transform: translateX(100%);
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -65,7 +34,7 @@
         class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="index.html" class="flex items-center gap-2">
+                <a href="../index.html" class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                         <span class="material-icons text-white text-lg">terminal</span>
                     </div>
@@ -259,10 +228,10 @@
         <p>© 2025 inovoid. All rights reserved.</p>
     </footer>
 
-    <script src="js/theme.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/supabase.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
     <script>
         let currentUser = null;
 

@@ -5,10 +5,12 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Inovoid | Technical Blogging Platform</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
     <script>
         tailwind.config = {
             darkMode: "class",
@@ -20,70 +22,7 @@
             },
         }
     </script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-        }
 
-        .hero-gradient {
-            background: radial-gradient(circle at 50% 50%, rgba(19, 127, 236, 0.15) 0%, transparent 70%);
-        }
-
-        .grid-pattern {
-            background-image: radial-gradient(rgba(19, 127, 236, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.5s ease-out both;
-        }
-
-        .animate-fade-in-delay-1 {
-            animation: fadeInUp 0.5s ease-out 0.1s both;
-        }
-
-        .animate-fade-in-delay-2 {
-            animation: fadeInUp 0.5s ease-out 0.2s both;
-        }
-
-        .animate-fade-in-delay-3 {
-            animation: fadeInUp 0.5s ease-out 0.3s both;
-        }
-
-        .mobile-menu-overlay {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .mobile-menu-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .mobile-menu-overlay:not(.hidden) {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .mobile-menu-panel {
-            transition: transform 0.3s ease;
-        }
-
-        .mobile-menu-overlay.hidden .mobile-menu-panel {
-            transform: translateX(100%);
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -102,19 +41,20 @@
                     <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">inovoid</span>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="feed.html">Feed</a>
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="feed.html">Explore</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="pages/feed.html">Feed</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors"
+                        href="pages/feed.html">Explore</a>
                     <a class="text-sm font-medium hover:text-primary transition-colors" href="#">About</a>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
                     <!-- Logged out links -->
                     <a data-auth="logged-out" class="text-sm font-medium hover:text-primary transition-colors"
-                        href="login.html">Login</a>
-                    <a data-auth="logged-out" href="signup.html"
+                        href="pages/login.html">Login</a>
+                    <a data-auth="logged-out" href="pages/signup.html"
                         class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary/20">
                         Get Started
                     </a>
                     <!-- Logged in links -->
-                    <a data-auth="logged-in" href="feed.html"
+                    <a data-auth="logged-in" href="pages/feed.html"
                         class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary/20"
                         style="display:none">
                         Go to Dashboard
@@ -140,24 +80,24 @@
                 </button>
             </div>
             <nav class="flex flex-col space-y-2 flex-1">
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">dynamic_feed</span> Feed
                 </a>
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">explore</span> Explore
                 </a>
                 <div class="border-t border-slate-200 dark:border-slate-800 my-4"></div>
-                <a data-auth="logged-out" href="login.html"
+                <a data-auth="logged-out" href="pages/login.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">login</span> Login
                 </a>
-                <a data-auth="logged-out" href="signup.html"
+                <a data-auth="logged-out" href="pages/signup.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary text-white font-semibold justify-center mt-2">
                     Get Started
                 </a>
-                <a data-auth="logged-in" href="feed.html"
+                <a data-auth="logged-in" href="pages/feed.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary text-white font-semibold justify-center mt-2"
                     style="display:none">
                     Dashboard
@@ -198,11 +138,11 @@
                 community of engineers.
             </p>
             <div class="animate-fade-in-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="signup.html"
+                <a href="pages/signup.html"
                     class="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl shadow-primary/25 transition-transform hover:-translate-y-1 text-center">
                     Start Writing Now
                 </a>
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary text-slate-900 dark:text-white rounded-xl font-bold text-lg transition-all text-center">
                     Explore Community
                 </a>
@@ -268,7 +208,7 @@
                     <p class="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
                         Join developers sharing their journey. No paywalls, no clutter, just pure engineering.
                     </p>
-                    <a href="signup.html"
+                    <a href="pages/signup.html"
                         class="inline-block bg-white text-primary hover:bg-slate-100 px-10 py-4 rounded-xl font-bold text-lg transition-all shadow-2xl">
                         Create Your Free Account
                     </a>
