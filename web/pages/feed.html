@@ -300,11 +300,11 @@
                                 <span class="material-icons-round text-lg" id="like-icon-${post.id}">${hasLiked ? 'favorite' : 'favorite_border'}</span>
                                 <span id="like-count-${post.id}">${reactionCount}</span>
                             </button>
-                            <a href="post.html?id=${post.id}#comments" class="flex items-center gap-2 text-slate-500 hover:text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors text-xs font-semibold">
+                            <a href="post.html?id=${post.id}#comments-section" class="flex items-center gap-2 text-slate-500 hover:text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors text-xs font-semibold">
                                 <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
                             </a>
                         </div>
-                        <a href="post.html?id=${post.id}" class="text-xs font-bold text-primary hover:underline">Read more →</a>
+                        <!-- Read more removed as requested -->
                     </div>
                 </div>
             </article>`;

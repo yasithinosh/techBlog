@@ -300,6 +300,14 @@
             await loadComments();
 
             document.getElementById('post-content').classList.remove('hidden');
+
+            // Handle hash scroll after content load
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const el = document.querySelector(window.location.hash);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 500); // Slight delay to ensure layout is stable
+            }
         }
 
         async function loadComments() {
