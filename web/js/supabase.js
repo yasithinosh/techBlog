@@ -109,21 +109,31 @@ async function fetchComments(postId) {
 }
 
 async function toggleCommentReaction(commentId, userId, type = 'like') {
+    console.log(`[Supabase] Toggling reaction: ${type} for comment ${commentId} by user ${userId}`);
+
     // Check if reaction exists
-    const { data: existing } = await supabaseClient
+    // Use maybeSingle() to avoid error if no row found
+    const { data: existing, error: fetchError } = await supabaseClient
         .from('comment_reactions')
         .select('id, type')
         .eq('comment_id', commentId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
+
+    if (fetchError) {
+        console.error('[Supabase] Fetch existing reaction error:', fetchError);
+        return { error: fetchError };
+    }
 
     if (existing) {
+        console.log('[Supabase] Found existing reaction:', existing);
         if (existing.type === type) {
             // Remove reaction if same type
             const { error } = await supabaseClient
                 .from('comment_reactions')
                 .delete()
                 .eq('id', existing.id);
+            if (error) console.error('[Supabase] Delete error:', error);
             return { reacted: false, error };
         } else {
             // Change reaction type (e.g. like -> dislike)
@@ -131,21 +141,27 @@ async function toggleCommentReaction(commentId, userId, type = 'like') {
                 .from('comment_reactions')
                 .update({ type })
                 .eq('id', existing.id);
+            if (error) console.error('[Supabase] Update error:', error);
             return { reacted: true, updated: true, error };
         }
     } else {
         // Add reaction
+        console.log('[Supabase] No existing reaction. Inserting...');
         const { error } = await supabaseClient
             .from('comment_reactions')
             .insert({ comment_id: commentId, user_id: userId, type });
+        if (error) console.error('[Supabase] Insert error:', error);
         return { reacted: true, error };
     }
 }
 
-async function addComment(postId, authorId, content) {
+async function addComment(postId, authorId, content, parentId = null) {
+    const payload = { post_id: postId, author_id: authorId, content };
+    if (parentId) payload.parent_id = parentId;
+
     const { data, error } = await supabaseClient
         .from('comments')
-        .insert({ post_id: postId, author_id: authorId, content })
+        .insert([payload])
         .select(`
             *,
             profiles:author_id (id, full_name, nickname, avatar_url)

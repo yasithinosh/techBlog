@@ -198,19 +198,47 @@
                 return;
             }
 
-            comments.forEach(comment => {
-                const isOwn = currentUser && comment.author_id === currentUser.id;
+            // Group by parent
+            const parents = comments.filter(c => !c.parent_id);
+            const replies = comments.filter(c => c.parent_id);
+            const replyMap = {};
+            replies.forEach(r => {
+                if (!replyMap[r.parent_id]) replyMap[r.parent_id] = [];
+                replyMap[r.parent_id].push(r);
+            });
 
-                const reactions = comment.reactions || [];
-                const likes = reactions.filter(r => r.type === 'like').length;
-                const dislikes = reactions.filter(r => r.type === 'dislike').length;
-                const userReaction = currentUser ? reactions.find(r => r.user_id === currentUser.id) : null;
-                const userLike = userReaction && userReaction.type === 'like';
-                const userDislike = userReaction && userReaction.type === 'dislike';
+            parents.forEach(comment => {
+                list.innerHTML += renderCommentHTML(comment);
 
-                list.innerHTML += `
-                    <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex gap-4 group">
-                    <img class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
+                // Render replies
+                const commentReplies = replyMap[comment.id] || [];
+                if (commentReplies.length > 0) {
+                    let repliesHTML = `<div class="ml-12 space-y-4 mt-4 border-l-2 border-slate-200 dark:border-slate-800 pl-4">`;
+                    commentReplies.forEach(reply => {
+                        repliesHTML += renderCommentHTML(reply, true);
+                    });
+                    repliesHTML += `</div>`;
+                    list.innerHTML += repliesHTML;
+                }
+
+                // Add reply form container
+                list.innerHTML += `<div id="reply-form-container-${comment.id}" class="hidden ml-12 mt-2"></div>`;
+            });
+        }
+
+        function renderCommentHTML(comment, isReply = false) {
+            const isOwn = currentUser && comment.author_id === currentUser.id;
+
+            const reactions = comment.reactions || [];
+            const likes = reactions.filter(r => r.type === 'like').length;
+            const dislikes = reactions.filter(r => r.type === 'dislike').length;
+            const userReaction = currentUser ? reactions.find(r => r.user_id === currentUser.id) : null;
+            const userLike = userReaction && userReaction.type === 'like';
+            const userDislike = userReaction && userReaction.type === 'dislike';
+
+            return `
+                <div class="${isReply ? 'bg-slate-50 dark:bg-slate-800/30' : 'bg-white dark:bg-slate-900/40'} border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex gap-4 group">
+                    <img class="${isReply ? 'w-8 h-8' : 'w-10 h-10'} rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
                          alt="${comment.profiles?.full_name || 'User'}"
                          src="${comment.profiles?.avatar_url || 'https://ui-avatars.com/api/?name=U&background=137fec&color=fff'}"/>
                     <div class="flex-1">
@@ -237,11 +265,52 @@
                                 <span class="material-icons-round text-sm" id="dislike-icon-${comment.id}">${userDislike ? 'thumb_down' : 'thumb_down_off_alt'}</span>
                                 <span id="dislike-count-${comment.id}">${dislikes || ''}</span>
                             </button>
-                            <button class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Reply</button>
+                            ${!isReply ? `<button onclick="showReplyForm('${comment.id}')" class="text-xs font-semibold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Reply</button>` : ''}
                         </div>
                     </div>
                 </div>`;
-            });
+        }
+
+        function showReplyForm(commentId) {
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+
+            // Close other forms if needed? For now let's just toggle.
+            const container = document.getElementById(`reply-form-container-${commentId}`);
+            if (!container.classList.contains('hidden')) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            // Create form
+            container.innerHTML = `
+                <div class="flex gap-3 animate-fade-in">
+                     <img class="w-8 h-8 rounded-full object-cover" src="${currentUser.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=Me'}" />
+                     <div class="flex-1">
+                        <textarea id="reply-input-${commentId}" rows="2" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Write a reply..."></textarea>
+                        <div class="flex justify-end gap-2 mt-2">
+                             <button onclick="document.getElementById('reply-form-container-${commentId}').classList.add('hidden')" class="text-xs font-medium text-slate-500 px-3 py-1 hover:text-slate-700">Cancel</button>
+                             <button onclick="submitReply('${commentId}')" class="text-xs font-medium bg-primary text-white px-4 py-1.5 rounded-lg hover:bg-primary/90">Reply</button>
+                        </div>
+                     </div>
+                </div>
+            `;
+            container.classList.remove('hidden');
+            document.getElementById(`reply-input-${commentId}`).focus();
+        }
+
+        async function submitReply(parentId) {
+            const input = document.getElementById(`reply-input-${parentId}`);
+            const content = input.value.trim();
+            if (!content) return;
+
+            const { error } = await addComment(postId, currentUser.id, content, parentId);
+            if (error) {
+                showToast(error.message, 'error');
+            } else {
+                showToast('Reply posted!', 'success');
+                await loadComments();
+            }
         }
 
         async function submitComment() {
@@ -267,78 +336,86 @@
         }
 
         async function handleCommentReaction(commentId, type) {
-            if (!currentUser) { window.location.href = 'login.html'; return; }
+            try {
+                // Debug: Verify function is called
+                console.log('handleCommentReaction called', commentId, type);
 
-            const likeBtn = document.getElementById(`like - btn - ${commentId} `);
-            const dislikeBtn = document.getElementById(`dislike - btn - ${commentId} `);
-            const likeIcon = document.getElementById(`like - icon - ${commentId} `);
-            const dislikeIcon = document.getElementById(`dislike - icon - ${commentId} `);
-            const likeCountEl = document.getElementById(`like - count - ${commentId} `);
-            const dislikeCountEl = document.getElementById(`dislike - count - ${commentId}`);
-
-            // Optimistic update logic
-            // This is complex because we have 3 states: None, Like, Dislike
-            // Simpler approach: Refresh list after small delay or implement full logic
-            // Implementing full logic for best UX
-
-            const wasLiked = likeBtn.classList.contains('text-primary');
-            const wasDisliked = dislikeBtn.classList.contains('text-red-500');
-
-            let likes = parseInt(likeCountEl.textContent) || 0;
-            let dislikes = parseInt(dislikeCountEl.textContent) || 0;
-
-            if (type === 'like') {
-                if (wasLiked) {
-                    // Untoggle
-                    likes--;
-                    likeBtn.classList.remove('text-primary');
-                    likeBtn.classList.add('text-slate-500');
-                    likeIcon.textContent = 'thumb_up_off_alt';
-                } else {
-                    // Toggle On
-                    likes++;
-                    likeBtn.classList.add('text-primary');
-                    likeBtn.classList.remove('text-slate-500');
-                    likeIcon.textContent = 'thumb_up';
-
-                    if (wasDisliked) {
-                        dislikes--;
-                        dislikeBtn.classList.remove('text-red-500');
-                        dislikeBtn.classList.add('text-slate-500');
-                        dislikeIcon.textContent = 'thumb_down_off_alt';
-                    }
+                if (!currentUser) {
+                    alert('You must be logged in to react.');
+                    window.location.href = 'login.html';
+                    return;
                 }
-            } else { // dislike
-                if (wasDisliked) {
-                    // Untoggle
-                    dislikes--;
-                    dislikeBtn.classList.remove('text-red-500');
-                    dislikeBtn.classList.add('text-slate-500');
-                    dislikeIcon.textContent = 'thumb_down_off_alt';
-                } else {
-                    // Toggle On
-                    dislikes++;
-                    dislikeBtn.classList.add('text-red-500');
-                    dislikeBtn.classList.remove('text-slate-500');
-                    dislikeIcon.textContent = 'thumb_down';
 
+                const likeBtn = document.getElementById(`like-btn-${commentId}`);
+                const dislikeBtn = document.getElementById(`dislike-btn-${commentId}`);
+                const likeIcon = document.getElementById(`like-icon-${commentId}`);
+                const dislikeIcon = document.getElementById(`dislike-icon-${commentId}`);
+                const likeCountEl = document.getElementById(`like-count-${commentId}`);
+                const dislikeCountEl = document.getElementById(`dislike-count-${commentId}`);
+
+                if (!likeBtn || !dislikeBtn) {
+                    throw new Error(`DOM Elements not found for ID: ${commentId}`);
+                }
+
+                // Optimistic update logic
+                const wasLiked = likeBtn.classList.contains('text-primary');
+                const wasDisliked = dislikeBtn.classList.contains('text-red-500');
+
+                let likes = parseInt(likeCountEl.textContent) || 0;
+                let dislikes = parseInt(dislikeCountEl.textContent) || 0;
+
+                if (type === 'like') {
                     if (wasLiked) {
                         likes--;
                         likeBtn.classList.remove('text-primary');
                         likeBtn.classList.add('text-slate-500');
                         likeIcon.textContent = 'thumb_up_off_alt';
+                    } else {
+                        likes++;
+                        likeBtn.classList.add('text-primary');
+                        likeBtn.classList.remove('text-slate-500');
+                        likeIcon.textContent = 'thumb_up';
+
+                        if (wasDisliked) {
+                            dislikes--;
+                            dislikeBtn.classList.remove('text-red-500');
+                            dislikeBtn.classList.add('text-slate-500');
+                            dislikeIcon.textContent = 'thumb_down_off_alt';
+                        }
+                    }
+                } else { // dislike
+                    if (wasDisliked) {
+                        dislikes--;
+                        dislikeBtn.classList.remove('text-red-500');
+                        dislikeBtn.classList.add('text-slate-500');
+                        dislikeIcon.textContent = 'thumb_down_off_alt';
+                    } else {
+                        dislikes++;
+                        dislikeBtn.classList.add('text-red-500');
+                        dislikeBtn.classList.remove('text-slate-500');
+                        dislikeIcon.textContent = 'thumb_down';
+
+                        if (wasLiked) {
+                            likes--;
+                            likeBtn.classList.remove('text-primary');
+                            likeBtn.classList.add('text-slate-500');
+                            likeIcon.textContent = 'thumb_up_off_alt';
+                        }
                     }
                 }
-            }
 
-            likeCountEl.textContent = likes || '';
-            dislikeCountEl.textContent = dislikes || '';
+                likeCountEl.textContent = likes || '';
+                dislikeCountEl.textContent = dislikes || '';
 
-            const { error } = await toggleCommentReaction(commentId, currentUser.id, type);
-            if (error) {
-                console.error(error);
-                showToast('Action failed', 'error');
-                await loadComments(); // Revert on error
+                const { error } = await toggleCommentReaction(commentId, currentUser.id, type);
+                if (error) {
+                    console.error(error);
+                    alert(`Reaction Failed: ${error.message || error.code || Object.keys(error)}`);
+                    await loadComments(); // Revert on error
+                }
+            } catch (err) {
+                console.error('Critical Error in handleCommentReaction:', err);
+                alert(`System Error: ${err.message}`);
             }
         }
 

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Reactions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="bg-slate-900 text-white p-6 font-mono min-h-screen overflow-y-auto">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4 text-primary">Comment Reactions Diagnostics</h1>
+        <div id="status" class="p-4 bg-slate-800 rounded mb-4 shadow-md">Initializing...</div>
+        <div id="log"
+            class="space-y-1 text-sm text-slate-400 bg-slate-950 p-4 rounded border border-slate-800 font-mono h-64 overflow-y-auto mb-4">
+        </div>
+        <div id="actions"></div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script>
+        function log(msg, type = 'info') {
+            const el = document.getElementById('log');
+            const div = document.createElement('div');
+            div.textContent = `> ${msg}`;
+            if (type === 'error') div.className = 'text-red-400 font-bold';
+            if (type === 'success') div.className = 'text-green-400 font-bold';
+            if (type === 'warning') div.className = 'text-yellow-400 font-bold';
+            el.appendChild(div);
+            el.scrollTop = el.scrollHeight; // Auto-scroll
+            return div;
+        }
+
+        async function runDiagnostics() {
+            const status = document.getElementById('status');
+            const actions = document.getElementById('actions');
+
+            try {
+                // 1. Check Service
+                if (!supabaseClient) throw new Error('Supabase Client not initialized');
+                log('Supabase Client: OK', 'success');
+
+                // 2. Check Auth FIRST
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    log('User NOT logged in.', 'error');
+                    status.textContent = 'LOGIN REQUIRED';
+                    status.className = 'p-4 bg-red-900/50 text-red-200 rounded mb-4 font-bold border border-red-500';
+
+                    actions.innerHTML = `
+                        <a href="login.html" class="block w-full text-center bg-primary hover:bg-blue-600 text-white font-bold py-3 px-4 rounded transition">
+                            Go to Login Page
+                        </a>
+                        <p class="mt-2 text-center text-slate-500 text-sm">Log in, then come back here.</p>
+                    `;
+                    return; // Stop here
+                }
+                log(`Logged in as: ${session.user.email}`, 'success');
+
+                // 3. Check Table
+                log('Checking "comment_reactions" table...');
+                const { error: tableError } = await supabaseClient
+                    .from('comment_reactions')
+                    .select('id')
+                    .limit(1);
+
+                if (tableError) {
+                    if (tableError.code === '42P01') {
+                        status.textContent = 'MISSING DATABASE TABLE';
+                        status.className = 'p-4 bg-red-900/50 text-red-200 rounded mb-4 font-bold';
+                        actions.innerHTML = '<div class="p-4 bg-black rounded border border-red-500 text-red-300">Run the SQL script (comment_reactions.sql) in Supabase.</div>';
+                        throw new Error('Table "comment_reactions" does not exist.');
+                    }
+                    throw tableError;
+                }
+                log('Table "comment_reactions" exists.', 'success');
+
+                // 4. Test Data Access
+                log('Checking for existing comments...');
+                const { data: comments, error: commentError } = await supabaseClient
+                    .from('comments')
+                    .select('id, content')
+                    .limit(1)
+                    .order('created_at', { ascending: false });
+
+                if (commentError) {
+                    throw new Error(`Failed to read comments table: ${commentError.message} (Hint: Check RLS policies)`);
+                }
+
+                let testComment = null;
+
+                if (!comments || comments.length === 0) {
+                    log('No comments found. Attempting to create one...', 'warning');
+
+                    // Need a post to comment on
+                    const { data: posts } = await supabaseClient.from('posts').select('id').limit(1);
+                    if (!posts || posts.length === 0) {
+                        throw new Error('No POSTS found in database. Cannot create a comment.');
+                    }
+
+                    // Create dummy comment
+                    const { data: newComment, error: createError } = await supabaseClient
+                        .from('comments')
+                        .insert({
+                            post_id: posts[0].id,
+                            author_id: session.user.id,
+                            content: 'Debug Comment ' + new Date().toISOString()
+                        })
+                        .select()
+                        .single();
+
+                    if (createError) throw new Error(`Failed to create test comment: ${createError.message}`);
+
+                    log('Created test comment!', 'success');
+                    testComment = newComment;
+                } else {
+                    testComment = comments[0];
+                    log('Found existing comment.', 'success');
+                }
+
+                log(`Testing with comment ID: ${testComment.id}`);
+
+                // Create a Test Button
+                const btn = document.createElement('button');
+                btn.className = 'w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-xl transition-all';
+                btn.textContent = '👉 CLICK TO TEST REACTION 👈';
+                btn.onclick = async () => {
+                    log('--- STARTING TEST ---', 'info');
+                    try {
+                        const { error: insertError } = await supabaseClient
+                            .from('comment_reactions')
+                            .insert({
+                                comment_id: testComment.id,
+                                user_id: session.user.id,
+                                type: 'like'
+                            });
+
+                        if (insertError) {
+                            if (insertError.code === '23505') {
+                                log('Already liked. Removing like...', 'warning');
+                                const { error: delError } = await supabaseClient
+                                    .from('comment_reactions')
+                                    .delete()
+                                    .eq('comment_id', testComment.id)
+                                    .eq('user_id', session.user.id);
+
+                                if (delError) throw delError;
+                                log('SUCCESS: Like Removed!', 'success');
+                                alert('SUCCESS: Verification Passed! You can close this page.');
+                            } else {
+                                throw insertError;
+                            }
+                        } else {
+                            log('SUCCESS: Like Added!', 'success');
+                            alert('SUCCESS: Verification Passed! You can close this page.');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        log(`TEST FAILED: ${e.message}`, 'error');
+                        alert('Test Failed. Check logs.');
+                    }
+                };
+
+                actions.appendChild(btn);
+
+                // TEST 2: Fetch Data
+                const btnFetch = document.createElement('button');
+                btnFetch.className = 'w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-6 rounded-lg text-lg shadow-xl transition-all mt-4';
+                btnFetch.textContent = '👉 CLICK TO TEST DATA FETCH 👈';
+                btnFetch.onclick = async () => {
+                    log('--- TESTING DATA FETCH (JOIN) ---', 'info');
+                    try {
+                        const { data, error } = await supabaseClient
+                            .from('comments')
+                            .select(`
+                               id, 
+                               content,
+                               reactions:comment_reactions (id, type, user_id)
+                           `)
+                            .eq('id', testComment.id)
+                            .single();
+
+                        if (error) throw error;
+
+                        log('Fetch Successful!', 'success');
+                        log(`Comment: ${data.content.substring(0, 10)}...`);
+                        if (data.reactions) {
+                            log(`Reactions found: ${data.reactions.length} (Array OK)`, 'success');
+                            log(`First reaction: ${JSON.stringify(data.reactions[0] || 'none')}`);
+                        } else {
+                            log('Reactions field is MISSING or null!', 'error');
+                        }
+
+                    } catch (e) {
+                        console.error(e);
+                        log(`FETCH FAILED: ${e.message}`, 'error');
+                        log('Possible cause: Foreign Key missing or Reference name mismatch.', 'warning');
+                    }
+                };
+                actions.appendChild(btnFetch);
+
+                status.textContent = 'READY. Try "TEST LIKE" then "TEST FETCH".';
+
+            } catch (err) {
+                console.error(err);
+                log(`ERROR: ${err.message}`, 'error');
+                status.textContent = 'DIAGNOSTICS FAILED';
+                status.className = 'p-4 bg-red-900/50 text-red-200 rounded mb-4 font-bold';
+            }
+        }
+
+        setTimeout(runDiagnostics, 1000);
+    </script>
+</body>
+
+</html>
