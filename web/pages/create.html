@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <title>Create New Blog Post | inovoid</title>
     <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -53,6 +53,28 @@
                     title="Toggle theme">
                     <span class="material-icons-round text-sm" data-theme-icon>light_mode</span>
                 </button>
+                <!-- Notification Bell -->
+                <div class="relative" data-auth="logged-in">
+                    <button id="notif-btn" onclick="toggleNotifications()"
+                        class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative">
+                        <span class="material-icons-round text-sm">notifications</span>
+                        <span id="notif-badge"
+                            class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notif-panel"
+                        class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in text-left">
+                        <div
+                            class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Notifications</h3>
+                            <button onclick="markAllRead()" class="text-xs text-primary hover:underline">Mark all
+                                read</button>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto bg-white dark:bg-background-dark">
+                            <div class="p-8 text-center text-slate-500 text-xs">No notifications yet</div>
+                        </div>
+                    </div>
+                </div>
                 <span class="hidden md:block text-xs text-slate-500 italic" id="save-status"></span>
                 <button onclick="handlePreview()"
                     class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
@@ -184,6 +206,7 @@
     <script src="../js/config.js"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
     <script>
         let currentUser = null;
         let editingPostId = null;

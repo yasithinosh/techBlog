@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <title>Blog Post | inovoid</title>
     <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -49,6 +49,29 @@
                     class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                     <span class="material-icons text-sm" data-theme-icon>light_mode</span>
                 </button>
+                <!-- Notification Bell -->
+                <div class="relative" data-auth="logged-in">
+                    <button id="notif-btn" onclick="toggleNotifications()"
+                        class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative">
+                        <span class="material-icons text-sm">notifications</span>
+                        <span id="notif-badge"
+                            class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notif-panel"
+                        class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in text-left">
+                        <div
+                            class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Notifications</h3>
+                            <button onclick="markAllRead()" class="text-xs text-primary hover:underline">Mark all
+                                read</button>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto bg-white dark:bg-background-dark">
+                            <div class="p-8 text-center text-slate-500 text-xs">No notifications yet</div>
+                        </div>
+                    </div>
+                </div>
+
                 <a href="profile.html" data-auth="logged-in"
                     class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 block">
                     <img data-auth-avatar class="w-full h-full object-cover" alt="Avatar"
@@ -194,6 +217,7 @@
     <script src="../js/config.js"></script>
     <script src="../js/supabase.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
     <script>
         let currentPost = null;
         let currentUser = null;
@@ -345,19 +369,47 @@
 
         async function handleReaction(type) {
             if (!currentUser) { window.location.href = 'login.html'; return; }
+
+            const icon = document.getElementById('like-icon');
+            const countEl = document.getElementById('like-count');
+            const btn = document.getElementById('like-btn');
+
+            // Optimistic update
+            const wasReacted = btn.classList.contains('text-pink-500');
+            const currentCount = parseInt(countEl.textContent) || 0;
+
+            // Toggle UI immediately
+            if (wasReacted) {
+                icon.textContent = 'favorite_border';
+                btn.classList.remove('text-pink-500');
+                countEl.textContent = Math.max(0, currentCount - 1);
+            } else {
+                icon.textContent = 'favorite';
+                btn.classList.add('text-pink-500');
+                countEl.textContent = currentCount + 1;
+            }
+
+            // Trigger animation
+            btn.classList.add('scale-125');
+            setTimeout(() => btn.classList.remove('scale-125'), 200);
+
+            // Send request
             const { reacted, error } = await toggleReaction(postId, currentUser.id, type);
-            if (!error) {
-                const icon = document.getElementById('like-icon');
-                const count = document.getElementById('like-count');
-                const btn = document.getElementById('like-btn');
-                if (reacted) {
+
+            if (error) {
+                // Revert on error
+                console.error('Reaction failed:', error);
+                showToast('Action failed. Please try again.', 'error');
+
+                // Revert UI
+                if (wasReacted) {
                     icon.textContent = 'favorite';
                     btn.classList.add('text-pink-500');
-                    count.textContent = parseInt(count.textContent) + 1;
+                    countEl.textContent = currentCount;
                 } else {
                     icon.textContent = 'favorite_border';
                     btn.classList.remove('text-pink-500');
-                    count.textContent = Math.max(0, parseInt(count.textContent) - 1);
+                    countEl.textContent = currentCount;
                 }
             }
         }
