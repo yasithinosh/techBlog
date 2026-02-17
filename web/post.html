@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Blog Post | inovoid</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.4s ease-out both;
+        }
+
+        .prose h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .prose h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .prose p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .prose pre {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
+
+        .prose code {
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
+        .prose ul,
+        .prose ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .prose li {
+            margin-bottom: 0.5rem;
+        }
+
+        .prose blockquote {
+            border-left: 4px solid #137fec;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300 min-h-screen">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-icons text-white text-lg">terminal</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">inovoid</span>
+                </a>
+                <a href="feed.html"
+                    class="text-sm text-slate-500 hover:text-primary transition-colors hidden md:inline">← Back to
+                    Feed</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons text-sm" data-theme-icon>light_mode</span>
+                </button>
+                <a href="profile.html" data-auth="logged-in"
+                    class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 block">
+                    <img data-auth-avatar class="w-full h-full object-cover" alt="Avatar"
+                        src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10">
+        <!-- Loading state -->
+        <div id="post-loading" class="flex justify-center items-center py-24">
+            <div class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-primary animate-bounce"></div>
+                <div class="w-3 h-3 rounded-full bg-primary animate-bounce" style="animation-delay:-0.15s"></div>
+                <div class="w-3 h-3 rounded-full bg-primary animate-bounce" style="animation-delay:-0.3s"></div>
+            </div>
+        </div>
+
+        <!-- Post Content (hidden until loaded) -->
+        <article id="post-content" class="hidden animate-fade-in">
+            <!-- Cover Image -->
+            <div id="post-cover-wrap"
+                class="hidden mb-8 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                <img id="post-cover" class="w-full h-80 object-cover" alt="Post cover" />
+            </div>
+
+            <!-- Tags -->
+            <div id="post-tags" class="flex flex-wrap gap-2 mb-4"></div>
+
+            <!-- Title -->
+            <h1 id="post-title" class="text-4xl md:text-5xl font-bold mb-6 leading-tight"></h1>
+
+            <!-- Author Info -->
+            <div class="flex items-center justify-between mb-10 pb-6 border-b border-slate-200 dark:border-slate-800">
+                <div class="flex items-center gap-4">
+                    <img id="author-avatar" class="w-12 h-12 rounded-full object-cover border-2 border-primary/20"
+                        alt="Author" src="" />
+                    <div>
+                        <h3 id="author-name" class="font-bold"></h3>
+                        <p id="post-date" class="text-sm text-slate-500"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="edit-btn"
+                        class="hidden px-4 py-2 text-sm font-medium border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-primary/10 hover:text-primary hover:border-primary transition-all">
+                        <span class="material-icons text-sm align-middle mr-1">edit</span>Edit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Post Body -->
+            <div id="post-body"
+                class="prose dark:prose-invert max-w-none text-lg text-slate-700 dark:text-slate-300 mb-12"></div>
+
+            <!-- Reaction Bar -->
+            <div
+                class="flex items-center justify-between py-6 px-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl mb-12">
+                <div class="flex items-center gap-6">
+                    <button id="like-btn" onclick="handleReaction('like')"
+                        class="flex items-center gap-2 text-slate-500 hover:text-pink-500 transition-colors group">
+                        <span class="material-icons text-2xl group-hover:scale-110 transition-transform"
+                            id="like-icon">favorite_border</span>
+                        <span class="font-bold" id="like-count">0</span>
+                    </button>
+                    <button onclick="scrollToComments()"
+                        class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
+                        <span class="material-icons text-2xl">chat_bubble_outline</span>
+                        <span class="font-bold" id="comment-count">0</span>
+                    </button>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="sharePost()"
+                        class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
+                        <span class="material-icons text-xl">share</span>
+                        <span class="text-sm font-medium hidden sm:inline">Share</span>
+                    </button>
+                    <button id="bookmark-btn" class="text-slate-500 hover:text-primary transition-colors">
+                        <span class="material-icons text-xl">bookmark_border</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <section id="comments-section" class="space-y-8">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <span class="material-icons text-primary">forum</span>
+                    Discussion <span class="text-slate-500 text-lg" id="comment-total"></span>
+                </h2>
+
+                <!-- New Comment Form (logged in only) -->
+                <div data-auth="logged-in"
+                    class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                    <div class="flex gap-4">
+                        <img data-auth-avatar
+                            class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
+                            alt="Your avatar" src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                        <div class="flex-1">
+                            <textarea id="comment-input"
+                                class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-sm"
+                                placeholder="Share your thoughts on this post..." rows="3"></textarea>
+                            <div class="flex justify-end mt-3">
+                                <button id="comment-submit" onclick="submitComment()"
+                                    class="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                    Post Comment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login prompt for non-authenticated -->
+                <div data-auth="logged-out"
+                    class="text-center py-6 bg-slate-50 dark:bg-slate-900/30 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl">
+                    <p class="text-slate-500 mb-3">Join the discussion</p>
+                    <a href="login.html"
+                        class="inline-block px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary/90 transition-all">Sign
+                        in to comment</a>
+                </div>
+
+                <!-- Comments List -->
+                <div id="comments-list" class="space-y-6"></div>
+            </section>
+        </article>
+
+        <!-- Error state -->
+        <div id="post-error" class="hidden text-center py-24">
+            <span class="material-icons text-6xl text-slate-400 mb-4 block">article</span>
+            <h2 class="text-2xl font-bold mb-2">Post not found</h2>
+            <p class="text-slate-500 mb-6">This post may have been deleted or doesn't exist.</p>
+            <a href="feed.html"
+                class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-all">Browse
+                Feed</a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-8 text-center text-slate-500 text-sm mt-12">
+        <p>© 2025 inovoid. Built by developers, for developers.</p>
+    </footer>
+
+    <script src="js/theme.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let currentPost = null;
+        let currentUser = null;
+
+        // Get post ID from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
+        async function loadPost() {
+            if (!postId) {
+                document.getElementById('post-loading').classList.add('hidden');
+                document.getElementById('post-error').classList.remove('hidden');
+                return;
+            }
+
+            currentUser = await getCurrentUser();
+            await updateNavAuth();
+
+            const { data: post, error } = await fetchPostById(postId);
+
+            document.getElementById('post-loading').classList.add('hidden');
+
+            if (error || !post) {
+                document.getElementById('post-error').classList.remove('hidden');
+                return;
+            }
+
+            currentPost = post;
+            document.title = `${post.title} | inovoid`;
+
+            // Populate post content
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('post-body').innerHTML = post.content;
+            document.getElementById('post-date').textContent = timeAgo(post.created_at);
+
+            // Cover image
+            if (post.cover_image_url) {
+                document.getElementById('post-cover').src = post.cover_image_url;
+                document.getElementById('post-cover-wrap').classList.remove('hidden');
+            }
+
+            // Tags
+            const tagsEl = document.getElementById('post-tags');
+            (post.tags || []).forEach(tag => {
+                tagsEl.innerHTML += `<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-semibold border border-primary/20">#${tag}</span>`;
+            });
+
+            // Author info
+            if (post.profiles) {
+                document.getElementById('author-name').textContent = post.profiles.full_name || post.profiles.nickname;
+                if (post.profiles.avatar_url) {
+                    document.getElementById('author-avatar').src = post.profiles.avatar_url;
+                }
+            }
+
+            // Show edit button if current user is author
+            if (currentUser && currentUser.id === post.author_id) {
+                const editBtn = document.getElementById('edit-btn');
+                editBtn.classList.remove('hidden');
+                editBtn.onclick = () => window.location.href = `create.html?id=${post.id}`;
+            }
+
+            // Reactions
+            const reactionCount = post.reactions ? post.reactions.length : 0;
+            document.getElementById('like-count').textContent = reactionCount;
+            if (currentUser && post.reactions) {
+                const userReacted = post.reactions.some(r => r.user_id === currentUser.id);
+                if (userReacted) {
+                    document.getElementById('like-icon').textContent = 'favorite';
+                    document.getElementById('like-btn').classList.add('text-pink-500');
+                }
+            }
+
+            // Comment count
+            const commentCount = post.comments ? post.comments.length : 0;
+            document.getElementById('comment-count').textContent = commentCount;
+            document.getElementById('comment-total').textContent = `(${commentCount})`;
+
+            // Load comments
+            await loadComments();
+
+            document.getElementById('post-content').classList.remove('hidden');
+        }
+
+        async function loadComments() {
+            const { data: comments } = await fetchComments(postId);
+            const list = document.getElementById('comments-list');
+            list.innerHTML = '';
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = '<p class="text-center text-slate-500 py-8">No comments yet. Be the first to share your thoughts!</p>';
+                return;
+            }
+
+            comments.forEach(comment => {
+                const isOwn = currentUser && comment.author_id === currentUser.id;
+                list.innerHTML += `
+                <div class="flex gap-4 group">
+                    <img class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
+                         alt="${comment.profiles?.full_name || 'User'}"
+                         src="${comment.profiles?.avatar_url || 'https://ui-avatars.com/api/?name=U&background=137fec&color=fff'}"/>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold text-sm">${comment.profiles?.full_name || comment.profiles?.nickname || 'Anonymous'}</span>
+                            <span class="text-xs text-slate-500">${timeAgo(comment.created_at)}</span>
+                        </div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${escapeHtml(comment.content)}</p>
+                        ${isOwn ? `<button onclick="removeComment('${comment.id}')" class="text-xs text-red-400 hover:text-red-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>` : ''}
+                    </div>
+                </div>`;
+            });
+        }
+
+        async function submitComment() {
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+            const input = document.getElementById('comment-input');
+            const content = input.value.trim();
+            if (!content) return;
+
+            const btn = document.getElementById('comment-submit');
+            btn.disabled = true;
+            btn.textContent = 'Posting...';
+
+            const { error } = await addComment(postId, currentUser.id, content);
+            if (error) {
+                showToast(error.message, 'error');
+            } else {
+                input.value = '';
+                await loadComments();
+                const count = parseInt(document.getElementById('comment-count').textContent) + 1;
+                document.getElementById('comment-count').textContent = count;
+                document.getElementById('comment-total').textContent = `(${count})`;
+                showToast('Comment posted!', 'success');
+            }
+            btn.disabled = false;
+            btn.textContent = 'Post Comment';
+        }
+
+        async function removeComment(commentId) {
+            const { error } = await deleteComment(commentId);
+            if (!error) {
+                await loadComments();
+                const count = Math.max(0, parseInt(document.getElementById('comment-count').textContent) - 1);
+                document.getElementById('comment-count').textContent = count;
+                document.getElementById('comment-total').textContent = `(${count})`;
+                showToast('Comment deleted', 'info');
+            }
+        }
+
+        async function handleReaction(type) {
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+            const { reacted, error } = await toggleReaction(postId, currentUser.id, type);
+            if (!error) {
+                const icon = document.getElementById('like-icon');
+                const count = document.getElementById('like-count');
+                const btn = document.getElementById('like-btn');
+                if (reacted) {
+                    icon.textContent = 'favorite';
+                    btn.classList.add('text-pink-500');
+                    count.textContent = parseInt(count.textContent) + 1;
+                } else {
+                    icon.textContent = 'favorite_border';
+                    btn.classList.remove('text-pink-500');
+                    count.textContent = Math.max(0, parseInt(count.textContent) - 1);
+                }
+            }
+        }
+
+        function sharePost() {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                showToast('Link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback
+                prompt('Copy this link:', url);
+            });
+        }
+
+        function scrollToComments() {
+            document.getElementById('comments-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        loadPost();
+    </script>
+</body>
+
+</html>
