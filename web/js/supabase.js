@@ -100,11 +100,46 @@ async function fetchComments(postId) {
         .from('comments')
         .select(`
             *,
-            profiles:author_id (id, full_name, nickname, avatar_url)
+            profiles:author_id (id, full_name, nickname, avatar_url),
+            reactions:comment_reactions (id, type, user_id)
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
     return { data, error };
+}
+
+async function toggleCommentReaction(commentId, userId, type = 'like') {
+    // Check if reaction exists
+    const { data: existing } = await supabaseClient
+        .from('comment_reactions')
+        .select('id, type')
+        .eq('comment_id', commentId)
+        .eq('user_id', userId)
+        .single();
+
+    if (existing) {
+        if (existing.type === type) {
+            // Remove reaction if same type
+            const { error } = await supabaseClient
+                .from('comment_reactions')
+                .delete()
+                .eq('id', existing.id);
+            return { reacted: false, error };
+        } else {
+            // Change reaction type (e.g. like -> dislike)
+            const { error } = await supabaseClient
+                .from('comment_reactions')
+                .update({ type })
+                .eq('id', existing.id);
+            return { reacted: true, updated: true, error };
+        }
+    } else {
+        // Add reaction
+        const { error } = await supabaseClient
+            .from('comment_reactions')
+            .insert({ comment_id: commentId, user_id: userId, type });
+        return { reacted: true, error };
+    }
 }
 
 async function addComment(postId, authorId, content) {

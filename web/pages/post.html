@@ -322,6 +322,14 @@
 
             comments.forEach(comment => {
                 const isOwn = currentUser && comment.author_id === currentUser.id;
+
+                const reactions = comment.reactions || [];
+                const likes = reactions.filter(r => r.type === 'like').length;
+                const dislikes = reactions.filter(r => r.type === 'dislike').length;
+                const userReaction = currentUser ? reactions.find(r => r.user_id === currentUser.id) : null;
+                const userLike = userReaction && userReaction.type === 'like';
+                const userDislike = userReaction && userReaction.type === 'dislike';
+
                 list.innerHTML += `
                 <div class="flex gap-4 group">
                     <img class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
@@ -332,8 +340,25 @@
                             <span class="font-bold text-sm">${comment.profiles?.full_name || comment.profiles?.nickname || 'Anonymous'}</span>
                             <span class="text-xs text-slate-500">${timeAgo(comment.created_at)}</span>
                         </div>
-                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${escapeHtml(comment.content)}</p>
-                        ${isOwn ? `<button onclick="removeComment('${comment.id}')" class="text-xs text-red-400 hover:text-red-500 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>` : ''}
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-2">${escapeHtml(comment.content)}</p>
+                        
+                        <div class="flex items-center gap-4">
+                            <!-- Like -->
+                            <button onclick="handleCommentReaction('${comment.id}', 'like')"
+                                id="like-btn-${comment.id}"
+                                class="flex items-center gap-1.5 text-xs font-semibold transition-colors ${userLike ? 'text-primary' : 'text-slate-500 hover:text-primary'}">
+                                <span class="material-icons-round text-sm" id="like-icon-${comment.id}">${userLike ? 'thumb_up' : 'thumb_up_off_alt'}</span>
+                                <span id="like-count-${comment.id}">${likes || ''}</span>
+                            </button>
+                            <!-- Dislike -->
+                            <button onclick="handleCommentReaction('${comment.id}', 'dislike')"
+                                id="dislike-btn-${comment.id}"
+                                class="flex items-center gap-1.5 text-xs font-semibold transition-colors ${userDislike ? 'text-red-500' : 'text-slate-500 hover:text-red-500'}">
+                                <span class="material-icons-round text-sm" id="dislike-icon-${comment.id}">${userDislike ? 'thumb_down' : 'thumb_down_off_alt'}</span>
+                                <span id="dislike-count-${comment.id}">${dislikes || ''}</span>
+                            </button>
+                            ${isOwn ? `<button onclick="removeComment('${comment.id}')" class="text-xs text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>` : ''}
+                        </div>
                     </div>
                 </div>`;
             });
