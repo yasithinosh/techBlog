@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <title>Login | inovoid</title>
     <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -125,15 +125,24 @@
             btn.disabled = true;
             btn.innerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
 
-            const { data, error } = await signIn(email, password);
+            try {
+                console.log('[inovoid] Attempting login for:', email);
+                const { data, error } = await signIn(email, password);
+                console.log('[inovoid] Login result:', { data, error });
 
-            if (error) {
-                showError(document.getElementById('status-msg'), error.message);
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Sign In</span><span class="material-icons text-sm">arrow_forward</span>';
+                } else {
+                    showSuccess(document.getElementById('status-msg'), 'Logged in! Redirecting...');
+                    setTimeout(() => window.location.href = 'feed.html', 1000);
+                }
+            } catch (err) {
+                console.error('[inovoid] Login exception:', err);
+                showError(document.getElementById('status-msg'), 'Connection error: ' + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '<span>Sign In</span><span class="material-icons text-sm">arrow_forward</span>';
-            } else {
-                showSuccess(document.getElementById('status-msg'), 'Logged in! Redirecting...');
-                setTimeout(() => window.location.href = 'feed.html', 1000);
             }
         });
 
@@ -145,11 +154,15 @@
                 showError(document.getElementById('status-msg'), 'Enter your email first, then click Forgot Password.');
                 return;
             }
-            const { error } = await supabase.auth.resetPasswordForEmail(email);
-            if (error) {
-                showError(document.getElementById('status-msg'), error.message);
-            } else {
-                showSuccess(document.getElementById('status-msg'), `Password reset link sent to ${email}`);
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                } else {
+                    showSuccess(document.getElementById('status-msg'), `Password reset link sent to ${email}`);
+                }
+            } catch (err) {
+                showError(document.getElementById('status-msg'), 'Error: ' + err.message);
             }
         });
     </script>

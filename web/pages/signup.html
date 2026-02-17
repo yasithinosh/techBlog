@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <title>Join inovoid | Technical Blog Platform</title>
     <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -164,16 +164,25 @@
             btn.disabled = true;
             btn.innerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
 
-            const { data, error } = await signUp(email, password, fullName);
+            try {
+                console.log('[inovoid] Attempting signup for:', email);
+                const { data, error } = await signUp(email, password, fullName);
+                console.log('[inovoid] Signup result:', { data, error });
 
-            if (error) {
-                showError(document.getElementById('status-msg'), error.message);
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Sign Up</span><span class="material-icons text-sm">arrow_forward</span>';
+                } else {
+                    // Show verification overlay
+                    document.getElementById('verify-email').textContent = email;
+                    document.getElementById('verification-overlay').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('[inovoid] Signup exception:', err);
+                showError(document.getElementById('status-msg'), 'Connection error: ' + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '<span>Sign Up</span><span class="material-icons text-sm">arrow_forward</span>';
-            } else {
-                // Show verification overlay
-                document.getElementById('verify-email').textContent = email;
-                document.getElementById('verification-overlay').classList.remove('hidden');
             }
         });
 

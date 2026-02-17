@@ -9,7 +9,20 @@ const SUPABASE_URL = APP_CONFIG.SUPABASE_URL;
 const SUPABASE_ANON_KEY = APP_CONFIG.SUPABASE_ANON_KEY;
 
 // Initialize Supabase client (loaded via CDN in HTML)
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// We use 'supabaseClient' to avoid collision with the 'supabase' global from CDN
+let supabaseClient;
+try {
+    const sb = window.supabase;
+    const createFn = sb.createClient || (sb.default && sb.default.createClient);
+    if (!createFn) {
+        throw new Error('createClient not found on window.supabase');
+    }
+    supabaseClient = createFn(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('[inovoid] Supabase client created. Has auth:', !!supabaseClient.auth);
+} catch (err) {
+    console.error('[inovoid] Failed to initialize Supabase:', err);
+    alert('Failed to connect to database. Check browser console for details.');
+}
 
 // ============================================
 // DATABASE HELPERS
@@ -17,7 +30,7 @@ const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- POSTS ---
 async function fetchPublishedPosts(limit = 20, offset = 0) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('posts')
         .select(`
             *,
@@ -32,7 +45,7 @@ async function fetchPublishedPosts(limit = 20, offset = 0) {
 }
 
 async function fetchPostById(postId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('posts')
         .select(`
             *,
@@ -46,7 +59,7 @@ async function fetchPostById(postId) {
 }
 
 async function fetchUserPosts(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('posts')
         .select('*')
         .eq('author_id', userId)
@@ -55,7 +68,7 @@ async function fetchUserPosts(userId) {
 }
 
 async function createPost(postData) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('posts')
         .insert(postData)
         .select()
@@ -64,7 +77,7 @@ async function createPost(postData) {
 }
 
 async function updatePost(postId, updates) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('posts')
         .update(updates)
         .eq('id', postId)
@@ -74,7 +87,7 @@ async function updatePost(postId, updates) {
 }
 
 async function deletePost(postId) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('posts')
         .delete()
         .eq('id', postId);
@@ -83,7 +96,7 @@ async function deletePost(postId) {
 
 // --- COMMENTS ---
 async function fetchComments(postId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('comments')
         .select(`
             *,
@@ -95,7 +108,7 @@ async function fetchComments(postId) {
 }
 
 async function addComment(postId, authorId, content) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('comments')
         .insert({ post_id: postId, author_id: authorId, content })
         .select(`
@@ -107,7 +120,7 @@ async function addComment(postId, authorId, content) {
 }
 
 async function deleteComment(commentId) {
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('comments')
         .delete()
         .eq('id', commentId);
@@ -117,7 +130,7 @@ async function deleteComment(commentId) {
 // --- REACTIONS ---
 async function toggleReaction(postId, userId, type = 'like') {
     // Check if reaction exists
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseClient
         .from('reactions')
         .select('id')
         .eq('post_id', postId)
@@ -126,14 +139,14 @@ async function toggleReaction(postId, userId, type = 'like') {
 
     if (existing) {
         // Remove reaction
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('reactions')
             .delete()
             .eq('id', existing.id);
         return { reacted: false, error };
     } else {
         // Add reaction
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from('reactions')
             .insert({ post_id: postId, user_id: userId, type });
         return { reacted: true, error };
@@ -141,7 +154,7 @@ async function toggleReaction(postId, userId, type = 'like') {
 }
 
 async function getReactionCount(postId) {
-    const { count, error } = await supabase
+    const { count, error } = await supabaseClient
         .from('reactions')
         .select('*', { count: 'exact', head: true })
         .eq('post_id', postId);
@@ -149,7 +162,7 @@ async function getReactionCount(postId) {
 }
 
 async function hasUserReacted(postId, userId) {
-    const { data } = await supabase
+    const { data } = await supabaseClient
         .from('reactions')
         .select('id')
         .eq('post_id', postId)
@@ -160,7 +173,7 @@ async function hasUserReacted(postId, userId) {
 
 // --- PROFILES ---
 async function fetchProfile(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -169,7 +182,7 @@ async function fetchProfile(userId) {
 }
 
 async function updateProfile(userId, updates) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('profiles')
         .update(updates)
         .eq('id', userId)
@@ -180,11 +193,11 @@ async function updateProfile(userId, updates) {
 
 // --- STORAGE ---
 async function uploadImage(bucket, filePath, file) {
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabaseClient.storage
         .from(bucket)
         .upload(filePath, file, { upsert: true });
     if (error) return { url: null, error };
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = supabaseClient.storage
         .from(bucket)
         .getPublicUrl(filePath);
     return { url: urlData.publicUrl, error: null };

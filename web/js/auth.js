@@ -12,7 +12,7 @@ function getPagesPath() {
 
 // Get current session
 async function getSession() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     return session;
 }
 
@@ -42,7 +42,7 @@ async function redirectIfLoggedIn() {
 
 // Sign up with email and password
 async function signUp(email, password, fullName) {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -57,7 +57,7 @@ async function signUp(email, password, fullName) {
 
 // Sign in with email and password
 async function signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
     });
@@ -66,13 +66,13 @@ async function signIn(email, password) {
 
 // Sign out
 async function signOut() {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     window.location.href = getBasePath() + 'index.html';
 }
 
 // Update password
 async function updatePassword(newPassword) {
-    const { data, error } = await supabase.auth.updateUser({
+    const { data, error } = await supabaseClient.auth.updateUser({
         password: newPassword
     });
     return { data, error };
@@ -80,7 +80,7 @@ async function updatePassword(newPassword) {
 
 // Listen for auth state changes
 function onAuthStateChange(callback) {
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
         callback(event, session);
     });
 }
