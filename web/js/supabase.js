@@ -214,3 +214,58 @@ async function uploadPostCover(userId, file) {
     const filePath = `${userId}/${Date.now()}.${ext}`;
     return uploadImage('post-covers', filePath, file);
 }
+
+// --- NOTIFICATIONS ---
+async function fetchNotifications(userId) {
+    const { data, error } = await supabaseClient
+        .from('notifications')
+        .select(`
+            *,
+            actor:actor_id (id, full_name, nickname, avatar_url),
+            post:post_id (id, title)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+    return { data, error };
+}
+
+async function getUnreadNotificationCount(userId) {
+    const { count, error } = await supabaseClient
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+    return { count, error };
+}
+
+async function markNotificationRead(notificationId) {
+    const { error } = await supabaseClient
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+    return { error };
+}
+
+async function markAllNotificationsRead(userId) {
+    const { error } = await supabaseClient
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', userId)
+        .eq('read', false);
+    return { error };
+}
+
+function subscribeToNotifications(userId, callback) {
+    return supabaseClient
+        .channel('public:notifications')
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`
+        }, payload => {
+            callback(payload.new);
+        })
+        .subscribe();
+}

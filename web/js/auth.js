@@ -104,6 +104,11 @@ async function updateNavAuth() {
         document.querySelectorAll('[data-auth-name]').forEach(el => {
             el.textContent = profile?.full_name || user.email;
         });
+
+        // Initialize notifications (if script is loaded)
+        if (typeof initNotifications === 'function') {
+            initNotifications(user);
+        }
     }
 }
 

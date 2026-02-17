@@ -59,6 +59,30 @@
                         style="display:none">
                         Go to Dashboard
                     </a>
+
+                    <!-- Notification Bell (Header) -->
+                    <div class="relative ml-2" data-auth="logged-in" style="display:none">
+                        <button id="notif-btn" onclick="toggleNotifications()"
+                            class="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-500 hover:text-primary relative">
+                            <span class="material-icons text-sm">notifications</span>
+                            <span id="notif-badge"
+                                class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 text-[10px] text-white flex items-center justify-center leading-none"></span>
+                        </button>
+                        <!-- Notification Dropdown -->
+                        <div id="notif-panel"
+                            class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+                            <div
+                                class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                                <h3 class="font-bold text-sm">Notifications</h3>
+                                <button onclick="markAllRead()" class="text-xs text-primary hover:underline">Mark all
+                                    read</button>
+                            </div>
+                            <div id="notif-list" class="max-h-80 overflow-y-auto bg-white dark:bg-background-dark">
+                                <!-- Items injected by JS -->
+                                <div class="p-8 text-center text-slate-500 text-xs">No notifications yet</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <button onclick="toggleMobileMenu()"
                     class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -232,11 +256,18 @@
                     <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
                     <a class="hover:text-primary transition-colors" href="#">Contact</a>
                 </div>
-                <button onclick="toggleTheme()"
-                    class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-600 dark:text-slate-400 hover:text-primary"
-                    title="Toggle theme">
-                    <span class="material-icons text-lg" data-theme-icon>light_mode</span>
-                </button>
+                <div class="flex items-center gap-4">
+                    <a class="text-slate-500 hover:text-primary transition-colors text-sm font-medium hidden md:block"
+                        href="pages/feed.html">Browse Posts</a>
+                    <button onclick="toggleTheme()"
+                        class="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-500 hover:text-primary"
+                        title="Toggle theme">
+                        <span class="material-icons text-sm" data-theme-icon>light_mode</span>
+                    </button>
+                    <!-- Footer Auth Links can just be text links, simplified -->
+                    <a data-auth="logged-out" href="pages/login.html"
+                        class="text-sm font-medium hover:text-primary transition-colors">Login</a>
+                </div>
             </div>
             <div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800/50 text-center">
                 <p class="text-slate-500 dark:text-slate-500 text-sm">© 2025 inovoid. All rights reserved.</p>
@@ -248,6 +279,7 @@
     <script src="js/config.js"></script>
     <script src="js/supabase.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
     <script>
         // Update nav based on auth state
         updateNavAuth();
