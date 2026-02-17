@@ -343,7 +343,8 @@
 
             const { error } = await addComment(postId, currentUser.id, content);
             if (error) {
-                showToast(error.message, 'error');
+                console.error('Comment failed:', error);
+                showToast(`Error: ${error.message || error.code}`, 'error');
             } else {
                 input.value = '';
                 await loadComments();
@@ -399,7 +400,8 @@
             if (error) {
                 // Revert on error
                 console.error('Reaction failed:', error);
-                showToast('Action failed. Please try again.', 'error');
+                // Show DETAILED error for debugging
+                showToast(`Error: ${error.message || error.code || 'Unknown error'}`, 'error');
 
                 // Revert UI
                 if (wasReacted) {

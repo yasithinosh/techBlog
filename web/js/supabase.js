@@ -35,7 +35,7 @@ async function fetchPublishedPosts(limit = 20, offset = 0) {
         .select(`
             *,
             profiles:author_id (id, full_name, nickname, avatar_url),
-            reactions:reactions (id, type),
+            reactions:reactions (id, type, user_id),
             comments:comments (id)
         `)
         .eq('published', true)

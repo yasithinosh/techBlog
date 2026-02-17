@@ -223,11 +223,12 @@
     <script src="../js/notifications.js"></script>
     <script>
         let allPosts = [];
+        let currentUser = null;
 
         // Auth guard
         async function init() {
-            const user = await requireAuth();
-            if (!user) return;
+            currentUser = await requireAuth();
+            if (!currentUser) return;
             await updateNavAuth();
             await loadPosts();
         }
@@ -273,6 +274,8 @@
                 const commentCount = post.comments ? post.comments.length : 0;
                 const tags = (post.tags || []).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">#${t}</span>`).join('');
 
+                const hasLiked = post.reactions && post.reactions.some(r => r.user_id === currentUser.id);
+
                 return `
             <article class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm" style="animation-delay:${i * 0.05}s">
                 ${post.cover_image_url ? `<a href="post.html?id=${post.id}" class="block"><img class="w-full h-48 object-cover" alt="${post.title}" src="${post.cover_image_url}"/></a>` : ''}
@@ -292,13 +295,14 @@
                     <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
                     ${tags ? `<div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>` : ''}
                     <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-6">
-                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
-                                <span class="material-icons-round text-lg">favorite_border</span> ${reactionCount}
-                            </span>
-                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+                        <div class="flex items-center gap-4">
+                            <button onclick="toggleFeedLike('${post.id}')" id="like-btn-${post.id}" class="flex items-center gap-2 text-xs font-semibold px-2 py-1 rounded-lg transition-colors ${hasLiked ? 'text-pink-500 bg-pink-50 dark:bg-pink-900/10' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                                <span class="material-icons-round text-lg" id="like-icon-${post.id}">${hasLiked ? 'favorite' : 'favorite_border'}</span>
+                                <span id="like-count-${post.id}">${reactionCount}</span>
+                            </button>
+                            <a href="post.html?id=${post.id}#comments" class="flex items-center gap-2 text-slate-500 hover:text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors text-xs font-semibold">
                                 <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
-                            </span>
+                            </a>
                         </div>
                         <a href="post.html?id=${post.id}" class="text-xs font-bold text-primary hover:underline">Read more →</a>
                     </div>
@@ -345,6 +349,53 @@
             const div = document.createElement('div');
             div.innerHTML = html;
             return div.textContent || div.innerText || '';
+        }
+
+        async function toggleFeedLike(postId) {
+            if (!currentUser) return;
+
+            const btn = document.getElementById(`like-btn-${postId}`);
+            const icon = document.getElementById(`like-icon-${postId}`);
+            const countEl = document.getElementById(`like-count-${postId}`);
+
+            // Optimistic update
+            const wasLiked = btn.classList.contains('text-pink-500');
+            const currentCount = parseInt(countEl.textContent) || 0;
+
+            if (wasLiked) {
+                btn.classList.remove('text-pink-500', 'bg-pink-50', 'dark:bg-pink-900/10');
+                btn.classList.add('text-slate-500', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+                icon.textContent = 'favorite_border';
+                countEl.textContent = Math.max(0, currentCount - 1);
+            } else {
+                btn.classList.add('text-pink-500', 'bg-pink-50', 'dark:bg-pink-900/10');
+                btn.classList.remove('text-slate-500', 'hover:bg-slate-100', 'dark:hover:bg-slate-800');
+                icon.textContent = 'favorite';
+                countEl.textContent = currentCount + 1;
+            }
+
+            // Animate
+            btn.classList.add('scale-110');
+            setTimeout(() => btn.classList.remove('scale-110'), 200);
+
+            const { error } = await toggleReaction(postId, currentUser.id, 'like');
+
+            if (error) {
+                console.error('Reaction error:', error);
+                showToast(`Error: ${error.message}`, 'error');
+                // Revert
+                if (wasLiked) {
+                    btn.classList.add('text-pink-500', 'bg-pink-50', 'dark:bg-pink-900/10');
+                    btn.classList.remove('text-slate-500');
+                    icon.textContent = 'favorite';
+                    countEl.textContent = currentCount;
+                } else {
+                    btn.classList.remove('text-pink-500');
+                    btn.classList.add('text-slate-500');
+                    icon.textContent = 'favorite_border';
+                    countEl.textContent = currentCount;
+                }
+            }
         }
 
         init();
