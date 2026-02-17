@@ -13,7 +13,7 @@ A modern, full-stack technical blogging platform built with **HTML/CSS/JS + Tail
 - 🌗 **Themes** — Dark and light mode with persistence
 - 📱 **Responsive** — Mobile-first design with bottom nav
 
-## Project Structure
+## Project Structure.
 
 ```
 techBlog/
