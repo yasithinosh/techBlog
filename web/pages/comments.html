@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <title>Comments | inovoid</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300 min-h-screen">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-icons text-white text-lg">terminal</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">inovoid</span>
+                </a>
+                <a href="feed.html"
+                    class="text-sm text-slate-500 hover:text-primary transition-colors hidden md:inline">← Back to
+                    Feed</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons text-sm" data-theme-icon>light_mode</span>
+                </button>
+                <!-- Notification Bell -->
+                <div class="relative" data-auth="logged-in">
+                    <button id="notif-btn" onclick="toggleNotifications()"
+                        class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors relative">
+                        <span class="material-icons text-sm">notifications</span>
+                        <span id="notif-badge"
+                            class="hidden absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notif-panel"
+                        class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in text-left">
+                        <div
+                            class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h3 class="font-bold text-sm text-slate-900 dark:text-white">Notifications</h3>
+                            <button onclick="markAllRead()" class="text-xs text-primary hover:underline">Mark all
+                                read</button>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto bg-white dark:bg-background-dark">
+                            <div class="p-8 text-center text-slate-500 text-xs">No notifications yet</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="profile.html" data-auth="logged-in"
+                    class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 block">
+                    <img data-auth-avatar class="w-full h-full object-cover" alt="Avatar"
+                        src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-8">
+        <!-- Post Summary -->
+        <div id="post-summary"
+            class="mb-8 p-6 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl animate-fade-in hidden">
+            <a id="post-link" href="#" class="block group">
+                <h1 id="post-title" class="text-2xl font-bold mb-2 group-hover:text-primary transition-colors"></h1>
+            </a>
+            <div class="flex items-center gap-2 text-sm text-slate-500 mb-4">
+                <span id="author-name" class="font-medium text-slate-900 dark:text-slate-200"></span>
+                <span>•</span>
+                <span id="post-date"></span>
+            </div>
+            <a id="back-to-post" href="#" class="text-sm font-bold text-primary hover:underline">View full post →</a>
+        </div>
+
+        <!-- Comments Section -->
+        <section class="space-y-6">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                <span class="material-icons text-primary">chat</span>
+                Comments <span id="comment-count" class="text-slate-500"></span>
+            </h2>
+
+            <!-- New Comment Form -->
+            <div data-auth="logged-in"
+                class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                <div class="flex gap-4">
+                    <img data-auth-avatar
+                        class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
+                        alt="Your avatar" src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                    <div class="flex-1">
+                        <textarea id="comment-input"
+                            class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all resize-none text-sm"
+                            placeholder="Share your thoughts..." rows="3"></textarea>
+                        <div class="flex justify-end mt-3">
+                            <button id="comment-submit" onclick="submitComment()"
+                                class="px-6 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                Post Comment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="comments-list" class="space-y-4">
+                <div class="flex justify-center py-12">
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce ml-1" style="animation-delay:-0.1s">
+                    </div>
+                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce ml-1" style="animation-delay:-0.2s">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script>
+        let currentUser = null;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let postId = window.location.hash.substring(1); // Get ID from hash (remove #)
+
+        // Fallback to query param if hash is empty (backward compatibility)
+        if (!postId) {
+            postId = urlParams.get('id');
+        }
+
+        async function init() {
+            // Debugging
+            console.log('Current URL:', window.location.href);
+            console.log('Parsed PostID:', postId);
+
+            if (!postId || postId.length < 5) { // Simple validation
+                alert(`No valid Post ID found.\nURL: ${window.location.href}`);
+                return;
+            }
+
+            currentUser = await getCurrentUser();
+            await updateNavAuth();
+
+            // Load Post Info
+            const { data: post, error } = await fetchPostById(postId);
+            if (error || !post) {
+                console.error('Fetch error:', error);
+                alert(`Error loading post: ${error ? error.message : 'Post not found'}`);
+                // Removed auto-redirect for debugging
+                // window.location.href = 'feed.html';
+                return;
+            }
+
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('post-date').textContent = timeAgo(post.created_at);
+            document.getElementById('author-name').textContent = post.profiles?.full_name || post.profiles?.nickname || 'Anonymous';
+            document.getElementById('post-link').href = `post.html?id=${post.id}`;
+            document.getElementById('back-to-post').href = `post.html?id=${post.id}`;
+            document.getElementById('post-summary').classList.remove('hidden');
+
+            await loadComments();
+        }
+
+        async function loadComments() {
+            const { data: comments } = await fetchComments(postId);
+            const list = document.getElementById('comments-list');
+            list.innerHTML = '';
+
+            const count = comments ? comments.length : 0;
+            document.getElementById('comment-count').textContent = `(${count})`;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = '<p class="text-center text-slate-500 py-8">No comments yet.</p>';
+                return;
+            }
+
+            comments.forEach(comment => {
+                const isOwn = currentUser && comment.author_id === currentUser.id;
+                list.innerHTML += `
+                <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex gap-4 group">
+                    <img class="w-10 h-10 rounded-full object-cover border border-slate-300 dark:border-slate-700 flex-shrink-0"
+                         alt="${comment.profiles?.full_name || 'User'}"
+                         src="${comment.profiles?.avatar_url || 'https://ui-avatars.com/api/?name=U&background=137fec&color=fff'}"/>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm text-slate-900 dark:text-slate-100">${comment.profiles?.full_name || comment.profiles?.nickname || 'Anonymous'}</span>
+                                <span class="text-xs text-slate-500">${timeAgo(comment.created_at)}</span>
+                            </div>
+                            ${isOwn ? `<button onclick="removeComment('${comment.id}')" class="text-xs text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>` : ''}
+                        </div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">${escapeHtml(comment.content)}</p>
+                    </div>
+                </div>`;
+            });
+        }
+
+        async function submitComment() {
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+            const input = document.getElementById('comment-input');
+            const content = input.value.trim();
+            if (!content) return;
+
+            const btn = document.getElementById('comment-submit');
+            btn.disabled = true;
+            btn.textContent = 'Posting...';
+
+            const { error } = await addComment(postId, currentUser.id, content);
+            if (error) {
+                showToast(`Error: ${error.message}`, 'error');
+            } else {
+                input.value = '';
+                await loadComments();
+                showToast('Comment posted!', 'success');
+            }
+            btn.disabled = false;
+            btn.textContent = 'Post Comment';
+        }
+
+        async function removeComment(commentId) {
+            const { error } = await deleteComment(commentId);
+            if (!error) {
+                await loadComments();
+                showToast('Comment deleted', 'info');
+            } else {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
