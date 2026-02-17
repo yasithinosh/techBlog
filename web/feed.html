@@ -4,37 +4,18 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Inovoid - Technical Blog Dashboard</title>
-    <script>
-        if (localStorage.getItem('inovoid-theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
+    <title>Inovoid — Technical Blog Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
                 },
             },
         }
@@ -42,19 +23,6 @@
     <style>
         body {
             font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 10px;
         }
 
         @keyframes fadeInUp {
@@ -72,21 +40,17 @@
         .animate-fade-in {
             animation: fadeInUp 0.4s ease-out both;
         }
-
-        .animate-fade-in-d1 {
-            animation: fadeInUp 0.4s ease-out 0.1s both;
-        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
 
-    <!-- Header Navigation -->
+    <!-- Header -->
     <header
         class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
         <div class="max-w-[1440px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
-            <!-- Logo -->
             <a href="index.html" class="flex items-center gap-2">
                 <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                     <span class="material-icons-round text-white text-2xl">terminal</span>
@@ -94,20 +58,19 @@
                 <span
                     class="text-2xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase hidden sm:inline">Inovoid</span>
             </a>
-            <!-- Search Bar -->
             <div class="flex-1 max-w-2xl relative group hidden md:block">
                 <span
                     class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-                <input
+                <input id="search-input"
                     class="w-full bg-slate-200/50 dark:bg-slate-800/50 border-none rounded-xl py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 placeholder:text-slate-500 text-sm"
-                    placeholder="Search for tech stacks, authors, or articles..." type="text" />
+                    placeholder="Search for tech stacks, authors, or articles..." type="text"
+                    onkeyup="handleSearch(event)" />
             </div>
-            <!-- Actions -->
             <div class="flex items-center gap-3">
                 <button onclick="toggleTheme()"
                     class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors"
                     title="Toggle theme">
-                    <span class="material-icons-round" id="theme-icon">light_mode</span>
+                    <span class="material-icons-round" data-theme-icon>light_mode</span>
                 </button>
                 <a href="create.html"
                     class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-primary/20">
@@ -117,23 +80,22 @@
                 <button
                     class="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors">
                     <span class="material-icons-round">notifications</span>
-                    <span
-                        class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light dark:border-background-dark"></span>
                 </button>
                 <a href="profile.html"
                     class="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-slate-200 dark:ring-slate-800 p-0.5 block">
-                    <img class="w-full h-full object-cover rounded-lg" alt="User avatar"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwFA8xXr3dJ4ix8LxlLGyeOiPCtJJAEB6CT9shzTfMoBZyjQbjCtqWsn72GHheY8QJxKdx6cgVPYOz2nitwGhHnbklffS3STT6_YW2dpCOKRYhe0atAgh-xEDzOTxIA2tjDgYXlP-0F-MvQhueSxg1jnh1I8oCmf__KD1LtLBeq5EYm6fHL_jY0kITlzHqlPR_IfQ6V9ZzGxtDSyhKceSaP7hsmBdr93SPREdH9KDKObdILHHl2PCRTo76Nwq6Tsn_cAjcR47p6tQ2" />
+                    <img data-auth-avatar class="w-full h-full object-cover rounded-lg" alt="User avatar"
+                        src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
                 </a>
             </div>
         </div>
     </header>
 
     <main class="max-w-[1440px] mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Sidebar Navigation (Left) -->
+        <!-- Sidebar (Left) -->
         <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-8">
             <nav class="space-y-1">
-                <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium" href="#">
+                <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium"
+                    href="feed.html">
                     <span class="material-icons-round">dynamic_feed</span> My Feed
                 </a>
                 <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
@@ -151,223 +113,91 @@
             </nav>
             <div class="space-y-4">
                 <h3 class="px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Categories</h3>
-                <div class="flex flex-wrap gap-2 px-2">
+                <div class="flex flex-wrap gap-2 px-2" id="tags-cloud">
                     <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#typescript</button>
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('typescript')">#typescript</button>
                     <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#rust</button>
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('rust')">#rust</button>
                     <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#devops</button>
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('devops')">#devops</button>
                     <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#ai</button>
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('ai')">#ai</button>
                     <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#architecture</button>
-                    <button
-                        class="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all">#react</button>
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('react')">#react</button>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Feed (Center) -->
+        <!-- Main Feed -->
         <section class="lg:col-span-6 space-y-6">
-            <!-- Feed Filter Tabs -->
             <div class="flex items-center gap-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <button class="text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1">Following</button>
+                <button class="text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1" id="tab-all"
+                    onclick="switchTab('all')">All Posts</button>
                 <button
-                    class="text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors">For
-                    You</button>
-                <button
-                    class="text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors">Community</button>
+                    class="text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors"
+                    id="tab-following" onclick="switchTab('following')">Following</button>
             </div>
 
-            <!-- Post Card 1 -->
-            <article
-                class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <img class="w-10 h-10 rounded-full object-cover" alt="Alex Rivera"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFJUVYeQ7hPc_gY1qn2VYblxqXASKnRLhmb1ax3VHLpmWll4WKM8uZREt8Zp6Up1VsO_UG6E8gwOz3AqddJiO_y-PlD8pkuOIcpVKeEGvBihKv9sF3aAZWYd7wSYox1181HHujPS3zveKSk6ohBBWFp7XDvftvZU823XfIhTVgAkZmF7OVeHbbgOXC2J2mqdkaeuHFm5c-Y9AiVHSXnJLOr4QgoObrK_jyKJHAQYGAGKo8V1k2s85cABS8SJPBoeV4q6wO1ssQpkI0" />
-                            <div>
-                                <h4 class="text-sm font-bold">Alex Rivera</h4>
-                                <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">
-                                    Software Architect • 2h ago</p>
-                            </div>
+            <!-- Posts container -->
+            <div id="posts-container">
+                <!-- Loading -->
+                <div id="posts-loading" class="flex justify-center py-12">
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.15s">
                         </div>
-                        <button class="text-slate-400 hover:text-primary transition-colors"><span
-                                class="material-icons-round">more_horiz</span></button>
-                    </div>
-                    <h2 class="text-xl font-bold mb-3 leading-snug hover:text-primary transition-colors cursor-pointer">
-                        Why Rust is becoming the standard for high-performance cloud infrastructure
-                    </h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">
-                        The shift from C++ to Rust isn't just about memory safety. It's about how the ownership model
-                        allows for zero-cost abstractions that were previously impossible to reason about in a
-                        multithreaded context. Here's how we migrated our core engine...
-                    </p>
-                    <div
-                        class="bg-slate-100 dark:bg-slate-950/50 rounded-xl p-4 mb-4 font-mono text-xs border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
-                        <span class="text-pink-500">fn</span> <span class="text-blue-400">main</span>() {<br />
-                        &nbsp;&nbsp;<span class="text-slate-500">// Efficient memory management</span><br />
-                        &nbsp;&nbsp;<span class="text-pink-500">let</span> data = <span
-                            class="text-yellow-500">vec!</span>[<span class="text-green-500">1</span>, <span
-                            class="text-green-500">2</span>, <span class="text-green-500">3</span>];<br />
-                        &nbsp;&nbsp;<span class="text-blue-400">process</span>(data);<br />
-                        }
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-6">
-                            <button class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
-                                <span class="material-icons-round text-xl">favorite_border</span>
-                                <span class="text-xs font-semibold">1.2k</span>
-                            </button>
-                            <button class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
-                                <span class="material-icons-round text-xl">chat_bubble_outline</span>
-                                <span class="text-xs font-semibold">84</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <button class="text-slate-500 hover:text-primary transition-colors"><span
-                                    class="material-icons-round text-xl">share</span></button>
-                            <button class="text-slate-500 hover:text-primary transition-colors"><span
-                                    class="material-icons-round text-xl">bookmark_border</span></button>
-                        </div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.3s"></div>
                     </div>
                 </div>
-            </article>
+            </div>
 
-            <!-- Post Card 2 -->
-            <article
-                class="animate-fade-in-d1 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <img class="w-10 h-10 rounded-full object-cover" alt="Sarah Chen"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD4jNZ_ZYJFDIE_Pcnk2Sv5FHahjdF_5vfQ2ln0Wb3u9q_yQ3Er7ZVIsz9y3FXba7eu0arndYRsU7x1cKu7XPxZa_lcem3po4jZ_3oh_wOqAEeWcUEU_n0JLuDZO3qndrbPxzETb9Rwg42Ff9ZxVCoVJVtlP1dRwCFIW2nQoJwp26h1lQp4zp-0OpU5wHRT1EagLOKRcZUjwtVKv9yV6CLvBou8ir-Eiiob18jv70dPVzYDBLXMJQSJYL4vsy1DLsM6Qjyvn_xtK9a" />
-                            <div>
-                                <h4 class="text-sm font-bold">Sarah Chen</h4>
-                                <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">Lead
-                                    AI Engineer • 5h ago</p>
-                            </div>
-                        </div>
-                        <button class="text-slate-400 hover:text-primary transition-colors"><span
-                                class="material-icons-round">more_horiz</span></button>
-                    </div>
-                    <h2 class="text-xl font-bold mb-3 leading-snug cursor-pointer hover:text-primary transition-colors">
-                        Leveling up your LLM prompts: Chain of Density Explained
-                    </h2>
-                    <div class="relative w-full h-48 mb-4 rounded-xl overflow-hidden">
-                        <img class="w-full h-full object-cover" alt="Neural network visualization"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5mwyBuRjYegR3-BwNs556OsxslkZifBTRKScj4AFzYFcU8d_9JADmbKARocKZkq2GASD3S8R43_6p_6WklsqLqotCk_O5nUSYI0mb0fkTxPqc6eFnhYqq8aIMfv-DIHIFv-YJlewPmE0hUvg0XEDRmhFwBXM6mNoOIArEyO-66wWJVQDlT8z-K4RKtV7epf-1ZXP0oNMWC6aPWHrZdM0ZSeoWRhhrx5aXDlWXxXdRSPgyO_bPemewCaMRZ7UOzcnPwpQmAGChuF6a" />
-                    </div>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-                        Instructional density is key to getting high-quality outputs from GPT-4 and Claude. By
-                        iteratively adding information without increasing word count, we can achieve better...
-                    </p>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
-                        <div class="flex items-center gap-6">
-                            <button class="flex items-center gap-2 text-pink-500 transition-colors">
-                                <span class="material-icons-round text-xl">favorite</span>
-                                <span class="text-xs font-semibold">3.4k</span>
-                            </button>
-                            <button class="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors">
-                                <span class="material-icons-round text-xl">chat_bubble_outline</span>
-                                <span class="text-xs font-semibold">156</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <button class="text-slate-500 hover:text-primary transition-colors"><span
-                                    class="material-icons-round text-xl">share</span></button>
-                            <button class="text-primary transition-colors"><span
-                                    class="material-icons-round text-xl">bookmark</span></button>
-                        </div>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Loading Indicator -->
-            <div class="flex justify-center py-8">
-                <div class="flex gap-2">
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]"></div>
-                    <div class="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]"></div>
-                </div>
+            <!-- Empty state -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <span class="material-icons-round text-6xl text-slate-300 dark:text-slate-700 mb-4 block">article</span>
+                <h3 class="text-xl font-bold mb-2">No posts yet</h3>
+                <p class="text-slate-500 mb-6">Be the first to share a technical insight!</p>
+                <a href="create.html"
+                    class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-all">Write
+                    a Post</a>
             </div>
         </section>
 
-        <!-- Right Side Panel -->
+        <!-- Right Panel -->
         <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-6">
-            <!-- Trending Topics -->
             <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
                 <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
                     <span class="material-icons-round text-primary text-lg">local_fire_department</span>
-                    Hot Topics
+                    Quick Actions
                 </h3>
-                <div class="space-y-4">
-                    <div class="group cursor-pointer">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Trending in DevOps</p>
-                        <h4 class="text-sm font-semibold group-hover:text-primary transition-colors">Kubernetes vs.
-                            Nomad in 2024</h4>
-                        <p class="text-xs text-slate-500">1.2k posts today</p>
-                    </div>
-                    <div class="group cursor-pointer">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Trending in Frontend
-                        </p>
-                        <h4 class="text-sm font-semibold group-hover:text-primary transition-colors">The rise of HTMX
-                            and simplified stacks</h4>
-                        <p class="text-xs text-slate-500">856 posts today</p>
-                    </div>
-                    <div class="group cursor-pointer">
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Trending in AI</p>
-                        <h4 class="text-sm font-semibold group-hover:text-primary transition-colors">Local LLMs with
-                            Ollama and Llama 3</h4>
-                        <p class="text-xs text-slate-500">3.4k posts today</p>
-                    </div>
-                </div>
-                <button class="w-full mt-6 text-xs font-bold text-primary hover:underline">Show more</button>
-            </div>
-
-            <!-- Top Contributors -->
-            <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
-                <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
-                    <span class="material-icons-round text-yellow-500 text-lg">workspace_premium</span>
-                    Top Contributors
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img class="w-8 h-8 rounded-full border-2 border-primary" alt="Jordan Lee"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPO_B8csQF8zy0sywtk3u2pvn3Oe_uxfS9HEpNGAlBrUYN-WTI2uBSrezfqk-sIHqlBpsa3mzaEpNkAGeNvxYy6z1ph_cgsnwP6BiTPBHPswpnohogABCMEl9h_hWQZ9jSHS5jBZ0PT_6p9wLmyiwAM4iagJBf9MWuNeCYdxQKIPW4VwbgB_EmvMuC8lE_ybJOFWcRKR0gHhViqvOhCJGVpB2GIXHdefDhlBi9H_SZvWd2DFiB0w7IFL7IjknYQ3i4st_nKgX0BuCk" />
-                            <div>
-                                <h4 class="text-xs font-bold">Jordan Lee</h4>
-                                <p class="text-[10px] text-slate-500">2.4k points</p>
-                            </div>
-                        </div>
-                        <button
-                            class="text-[10px] font-bold text-primary border border-primary/30 px-2 py-1 rounded-lg hover:bg-primary hover:text-white transition-all">Follow</button>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <img class="w-8 h-8 rounded-full" alt="Maria Garcia"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpcTR28aYjiG8bvrj1d2iaNvP08tT5n5EVT3XYZkCN9-tim50Xu0dOC6bmSyBP0BpmDpvW7JAZUFNd_AKweADvyI5wI1KctqtG79bi5DrtkZOK8o3BijkrgU9b90BJBIZ5SP9rFjxaxO6W1AspHrVlTguQsVpBq9aLGPxg9oGe0el5x5qxQ0t4eZdf0I4xlTko7m2ig--k9NXSwfFnOHMTypwyCywhMqA_5nP5kdH_btF5Ty3esqkdI8uh4e4-RvwjUoU4_WMzlLG2" />
-                            <div>
-                                <h4 class="text-xs font-bold">Maria Garcia</h4>
-                                <p class="text-[10px] text-slate-500">1.9k points</p>
-                            </div>
-                        </div>
-                        <button
-                            class="text-[10px] font-bold text-primary border border-primary/30 px-2 py-1 rounded-lg hover:bg-primary hover:text-white transition-all">Follow</button>
-                    </div>
+                <div class="space-y-3">
+                    <a href="create.html"
+                        class="flex items-center gap-3 p-3 bg-primary/10 rounded-xl text-sm font-medium text-primary hover:bg-primary/20 transition-colors">
+                        <span class="material-icons-round text-lg">add_circle</span> Write a new post
+                    </a>
+                    <a href="profile.html"
+                        class="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium hover:bg-primary/10 hover:text-primary transition-colors">
+                        <span class="material-icons-round text-lg">person</span> Edit your profile
+                    </a>
+                    <a href="settings.html"
+                        class="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium hover:bg-primary/10 hover:text-primary transition-colors">
+                        <span class="material-icons-round text-lg">settings</span> Account settings
+                    </a>
+                    <button onclick="signOut()"
+                        class="w-full flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                        <span class="material-icons-round text-lg">logout</span> Sign out
+                    </button>
                 </div>
             </div>
-
-            <!-- Footer Links -->
             <div
                 class="px-4 text-[10px] text-slate-500 flex flex-wrap gap-x-4 gap-y-2 uppercase font-bold tracking-widest">
                 <a class="hover:text-primary transition-colors" href="#">About</a>
                 <a class="hover:text-primary transition-colors" href="#">Privacy</a>
                 <a class="hover:text-primary transition-colors" href="#">Terms</a>
-                <a class="hover:text-primary transition-colors" href="#">API</a>
                 <span>© 2025 INOVOID</span>
             </div>
         </aside>
@@ -381,22 +211,141 @@
         <a href="create.html"
             class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center -translate-y-4 shadow-xl"><span
                 class="material-icons-round">add</span></a>
-        <a href="#" class="text-slate-500"><span class="material-icons-round">chat</span></a>
+        <a href="#" class="text-slate-500"><span class="material-icons-round">search</span></a>
         <a href="profile.html" class="text-slate-500"><span class="material-icons-round">person</span></a>
     </div>
     <div class="lg:hidden h-20"></div>
 
+    <script src="js/theme.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('inovoid-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            updateThemeIcon();
+        let allPosts = [];
+
+        // Auth guard
+        async function init() {
+            const user = await requireAuth();
+            if (!user) return;
+            await updateNavAuth();
+            await loadPosts();
         }
-        function updateThemeIcon() {
-            const icon = document.getElementById('theme-icon');
-            if (icon) icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+
+        async function loadPosts() {
+            const container = document.getElementById('posts-container');
+            const loading = document.getElementById('posts-loading');
+            const emptyState = document.getElementById('empty-state');
+
+            const { data: posts, error } = await fetchPublishedPosts(50);
+
+            loading.classList.add('hidden');
+
+            if (error) {
+                showError(container, 'Failed to load posts: ' + error.message);
+                return;
+            }
+
+            allPosts = posts || [];
+
+            if (allPosts.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            renderPosts(allPosts);
         }
-        updateThemeIcon();
+
+        function renderPosts(posts) {
+            const container = document.getElementById('posts-container');
+            const emptyState = document.getElementById('empty-state');
+
+            if (posts.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = posts.map((post, i) => {
+                const author = post.profiles || {};
+                const reactionCount = post.reactions ? post.reactions.length : 0;
+                const commentCount = post.comments ? post.comments.length : 0;
+                const tags = (post.tags || []).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">#${t}</span>`).join('');
+
+                return `
+            <article class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm" style="animation-delay:${i * 0.05}s">
+                ${post.cover_image_url ? `<a href="post.html?id=${post.id}" class="block"><img class="w-full h-48 object-cover" alt="${post.title}" src="${post.cover_image_url}"/></a>` : ''}
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <img class="w-10 h-10 rounded-full object-cover" alt="${author.full_name || 'Author'}" src="${author.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author.full_name || 'U') + '&background=137fec&color=fff'}"/>
+                            <div>
+                                <h4 class="text-sm font-bold">${author.full_name || author.nickname || 'Anonymous'}</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">${author.nickname ? '@' + author.nickname + ' • ' : ''}${timeAgo(post.created_at)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="post.html?id=${post.id}" class="block">
+                        <h2 class="text-xl font-bold mb-3 leading-snug hover:text-primary transition-colors cursor-pointer">${escapeHtml(post.title)}</h2>
+                    </a>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
+                    ${tags ? `<div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>` : ''}
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-6">
+                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+                                <span class="material-icons-round text-lg">favorite_border</span> ${reactionCount}
+                            </span>
+                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+                                <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
+                            </span>
+                        </div>
+                        <a href="post.html?id=${post.id}" class="text-xs font-bold text-primary hover:underline">Read more →</a>
+                    </div>
+                </div>
+            </article>`;
+            }).join('');
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) { renderPosts(allPosts); return; }
+            const filtered = allPosts.filter(p =>
+                p.title.toLowerCase().includes(query) ||
+                (p.tags || []).some(t => t.toLowerCase().includes(query)) ||
+                (p.profiles?.full_name || '').toLowerCase().includes(query)
+            );
+            renderPosts(filtered);
+        }
+
+        function filterByTag(tag) {
+            const filtered = allPosts.filter(p => (p.tags || []).includes(tag));
+            renderPosts(filtered.length > 0 ? filtered : allPosts);
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-all').className = tab === 'all'
+                ? 'text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1'
+                : 'text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors';
+            document.getElementById('tab-following').className = tab === 'following'
+                ? 'text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1'
+                : 'text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors';
+            renderPosts(allPosts);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function stripHtml(html) {
+            if (!html) return '';
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
+        init();
     </script>
 </body>
 
