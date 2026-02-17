@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <title>Account Settings | inovoid</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-icons text-white text-lg">terminal</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">inovoid</span>
+                </a>
+                <div class="hidden md:flex items-center gap-2 text-slate-500 text-sm">
+                    <span class="material-icons text-sm">chevron_right</span>
+                    <a class="hover:text-primary transition-colors" href="feed.html">Dashboard</a>
+                    <span class="material-icons text-sm">chevron_right</span>
+                    <span class="font-medium text-slate-800 dark:text-slate-200">Settings</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <span class="material-icons text-sm" data-theme-icon>light_mode</span>
+                </button>
+                <a href="feed.html"
+                    class="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-primary/10 hover:text-primary hover:border-primary transition-all">
+                    <span class="material-icons-round text-lg">arrow_back</span> Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        <div class="flex flex-col lg:flex-row gap-10">
+            <!-- Sidebar -->
+            <aside class="w-full lg:w-64 shrink-0">
+                <nav class="space-y-1 lg:sticky lg:top-24">
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
+                        href="profile.html">
+                        <span class="material-icons text-lg">person</span> Profile
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-semibold"
+                        href="settings.html">
+                        <span class="material-icons text-lg">settings</span> Account
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
+                        href="#appearance">
+                        <span class="material-icons text-lg">palette</span> Appearance
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
+                        href="#security">
+                        <span class="material-icons text-lg">shield</span> Security
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-medium transition-colors"
+                        href="#privacy">
+                        <span class="material-icons text-lg">lock</span> Privacy
+                    </a>
+                    <div class="border-t border-slate-200 dark:border-slate-800 my-3"></div>
+                    <button onclick="signOut()"
+                        class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-xl font-medium transition-colors">
+                        <span class="material-icons text-lg">logout</span> Sign Out
+                    </button>
+                </nav>
+            </aside>
+
+            <!-- Settings Content -->
+            <div class="flex-1 max-w-3xl space-y-12 pb-24 animate-fade-in">
+                <!-- Appearance Section -->
+                <section class="space-y-6" id="appearance">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-icons text-primary">palette</span> Appearance
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Customize the look and feel of inovoid.</p>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">Theme Mode</h3>
+                                <p class="text-sm text-slate-500">Switch between dark and light mode.</p>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-full p-1">
+                                <button id="light-btn" onclick="setTheme('light')"
+                                    class="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-all">
+                                    <span class="material-icons">light_mode</span>
+                                </button>
+                                <button id="dark-btn" onclick="setTheme('dark')"
+                                    class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white shadow-lg transition-all">
+                                    <span class="material-icons">dark_mode</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Security Section -->
+                <section class="space-y-6" id="security">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-icons text-primary">shield</span> Security
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Manage your password and security settings.</p>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-6">
+                        <h3 class="font-semibold">Change Password</h3>
+                        <div id="password-status"></div>
+                        <div class="space-y-4 max-w-md">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">New
+                                    Password</label>
+                                <input id="new-password"
+                                    class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                    placeholder="Enter new password" type="password" minlength="8" />
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Confirm
+                                    Password</label>
+                                <input id="confirm-password"
+                                    class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg py-3 px-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                    placeholder="Confirm new password" type="password" minlength="8" />
+                            </div>
+                            <button onclick="handlePasswordChange()" id="password-btn"
+                                class="px-6 py-2.5 bg-primary text-white rounded-lg font-semibold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Privacy Section -->
+                <section class="space-y-6" id="privacy">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-icons text-primary">lock</span> Privacy
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Control who can see your profile and data.</p>
+                    </div>
+                    <div
+                        class="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl divide-y divide-slate-200 dark:divide-slate-800">
+                        <!-- Profile Visibility -->
+                        <div class="p-6 flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">Public Profile</h3>
+                                <p class="text-sm text-slate-500">Allow others to see your profile and posts.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="profile-public" class="sr-only peer"
+                                    onchange="handlePrivacyToggle()">
+                                <div
+                                    class="w-11 h-6 bg-slate-300 peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
+                            </label>
+                        </div>
+                        <!-- Email Visibility -->
+                        <div class="p-6 flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold">Show Email Address</h3>
+                                <p class="text-sm text-slate-500">Display your email on your public profile.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-slate-300 peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Danger Zone -->
+                <section class="space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2 text-red-500">
+                            <span class="material-icons">warning</span> Danger Zone
+                        </h2>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-xl p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-red-600 dark:text-red-400">Delete Account</h3>
+                                <p class="text-sm text-red-500/70">Permanently delete your account and all data. This
+                                    cannot be undone.</p>
+                            </div>
+                            <button onclick="handleDeleteAccount()"
+                                class="px-5 py-2 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg font-medium text-sm hover:bg-red-100 dark:hover:bg-red-900/20 transition-all">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-8 text-center text-slate-500 text-sm">
+        <p>© 2025 inovoid. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        let currentUser = null;
+
+        async function init() {
+            currentUser = await requireAuth();
+            if (!currentUser) return;
+
+            // Load privacy settings
+            const { data: profile } = await fetchProfile(currentUser.id);
+            if (profile) {
+                document.getElementById('profile-public').checked = profile.is_public !== false;
+            }
+
+            // Update theme buttons state
+            updateThemeIcons();
+        }
+
+        async function handlePasswordChange() {
+            const newPwd = document.getElementById('new-password').value;
+            const confirmPwd = document.getElementById('confirm-password').value;
+            const statusEl = document.getElementById('password-status');
+            const btn = document.getElementById('password-btn');
+
+            if (newPwd.length < 8) {
+                showError(statusEl, 'Password must be at least 8 characters.');
+                return;
+            }
+            if (newPwd !== confirmPwd) {
+                showError(statusEl, 'Passwords do not match.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            const { error } = await updatePassword(newPwd);
+            if (error) {
+                showError(statusEl, error.message);
+            } else {
+                showSuccess(statusEl, 'Password updated successfully!');
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+                showToast('Password changed!', 'success');
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Update Password';
+        }
+
+        async function handlePrivacyToggle() {
+            const isPublic = document.getElementById('profile-public').checked;
+            const { error } = await updateProfile(currentUser.id, { is_public: isPublic });
+            if (error) {
+                showToast('Failed to update privacy: ' + error.message, 'error');
+            } else {
+                showToast(isPublic ? 'Profile is now public' : 'Profile is now private', 'success');
+            }
+        }
+
+        async function handleDeleteAccount() {
+            if (!confirm('Are you absolutely sure? This will permanently delete your account and all posts/comments.')) return;
+            if (!confirm('This CANNOT be undone. Type "delete" to confirm.')) return;
+
+            // Note: Supabase doesn't allow users to delete themselves from client-side.
+            // This would typically require a Supabase Edge Function or admin action.
+            showToast('Please contact support to delete your account.', 'warning');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

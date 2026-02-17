@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <title>Inovoid — Technical Blog Dashboard</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-[1440px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <a href="../index.html" class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                    <span class="material-icons-round text-white text-2xl">terminal</span>
+                </div>
+                <span
+                    class="text-2xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase hidden sm:inline">Inovoid</span>
+            </a>
+            <div class="flex-1 max-w-2xl relative group hidden md:block">
+                <span
+                    class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                <input id="search-input"
+                    class="w-full bg-slate-200/50 dark:bg-slate-800/50 border-none rounded-xl py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 placeholder:text-slate-500 text-sm"
+                    placeholder="Search for tech stacks, authors, or articles..." type="text"
+                    onkeyup="handleSearch(event)" />
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                    title="Toggle theme">
+                    <span class="material-icons-round" data-theme-icon>light_mode</span>
+                </button>
+                <a href="create.html"
+                    class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-primary/20">
+                    <span class="material-icons-round text-xl">add_circle</span>
+                    <span class="hidden sm:inline">Create Post</span>
+                </a>
+                <button
+                    class="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors">
+                    <span class="material-icons-round">notifications</span>
+                </button>
+                <a href="profile.html"
+                    class="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-slate-200 dark:ring-slate-800 p-0.5 block">
+                    <img data-auth-avatar class="w-full h-full object-cover rounded-lg" alt="User avatar"
+                        src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Sidebar (Left) -->
+        <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-8">
+            <nav class="space-y-1">
+                <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium"
+                    href="feed.html">
+                    <span class="material-icons-round">dynamic_feed</span> My Feed
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="#">
+                    <span class="material-icons-round">bolt</span> Latest
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="#">
+                    <span class="material-icons-round">trending_up</span> Trending
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="#">
+                    <span class="material-icons-round">bookmarks</span> Bookmarks
+                </a>
+            </nav>
+            <div class="space-y-4">
+                <h3 class="px-4 text-xs font-bold uppercase tracking-widest text-slate-400">Categories</h3>
+                <div class="flex flex-wrap gap-2 px-2" id="tags-cloud">
+                    <button
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('typescript')">#typescript</button>
+                    <button
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('rust')">#rust</button>
+                    <button
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('devops')">#devops</button>
+                    <button
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('ai')">#ai</button>
+                    <button
+                        class="tag-btn px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-xs font-semibold rounded-lg hover:bg-primary/20 hover:text-primary transition-all"
+                        onclick="filterByTag('react')">#react</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Feed -->
+        <section class="lg:col-span-6 space-y-6">
+            <div class="flex items-center gap-6 border-b border-slate-200 dark:border-slate-800 pb-2">
+                <button class="text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1" id="tab-all"
+                    onclick="switchTab('all')">All Posts</button>
+                <button
+                    class="text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors"
+                    id="tab-following" onclick="switchTab('following')">Following</button>
+            </div>
+
+            <!-- Posts container -->
+            <div id="posts-container">
+                <!-- Loading -->
+                <div id="posts-loading" class="flex justify-center py-12">
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.15s">
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.3s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <span class="material-icons-round text-6xl text-slate-300 dark:text-slate-700 mb-4 block">article</span>
+                <h3 class="text-xl font-bold mb-2">No posts yet</h3>
+                <p class="text-slate-500 mb-6">Be the first to share a technical insight!</p>
+                <a href="create.html"
+                    class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-all">Write
+                    a Post</a>
+            </div>
+        </section>
+
+        <!-- Right Panel -->
+        <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-6">
+            <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+                <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
+                    <span class="material-icons-round text-primary text-lg">local_fire_department</span>
+                    Quick Actions
+                </h3>
+                <div class="space-y-3">
+                    <a href="create.html"
+                        class="flex items-center gap-3 p-3 bg-primary/10 rounded-xl text-sm font-medium text-primary hover:bg-primary/20 transition-colors">
+                        <span class="material-icons-round text-lg">add_circle</span> Write a new post
+                    </a>
+                    <a href="profile.html"
+                        class="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium hover:bg-primary/10 hover:text-primary transition-colors">
+                        <span class="material-icons-round text-lg">person</span> Edit your profile
+                    </a>
+                    <a href="settings.html"
+                        class="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium hover:bg-primary/10 hover:text-primary transition-colors">
+                        <span class="material-icons-round text-lg">settings</span> Account settings
+                    </a>
+                    <button onclick="signOut()"
+                        class="w-full flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                        <span class="material-icons-round text-lg">logout</span> Sign out
+                    </button>
+                </div>
+            </div>
+            <div
+                class="px-4 text-[10px] text-slate-500 flex flex-wrap gap-x-4 gap-y-2 uppercase font-bold tracking-widest">
+                <a class="hover:text-primary transition-colors" href="#">About</a>
+                <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+                <a class="hover:text-primary transition-colors" href="#">Terms</a>
+                <span>© 2025 INOVOID</span>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <div
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-50">
+        <a href="feed.html" class="text-primary"><span class="material-icons-round">home</span></a>
+        <a href="#" class="text-slate-500"><span class="material-icons-round">explore</span></a>
+        <a href="create.html"
+            class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center -translate-y-4 shadow-xl"><span
+                class="material-icons-round">add</span></a>
+        <a href="#" class="text-slate-500"><span class="material-icons-round">search</span></a>
+        <a href="profile.html" class="text-slate-500"><span class="material-icons-round">person</span></a>
+    </div>
+    <div class="lg:hidden h-20"></div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        let allPosts = [];
+
+        // Auth guard
+        async function init() {
+            const user = await requireAuth();
+            if (!user) return;
+            await updateNavAuth();
+            await loadPosts();
+        }
+
+        async function loadPosts() {
+            const container = document.getElementById('posts-container');
+            const loading = document.getElementById('posts-loading');
+            const emptyState = document.getElementById('empty-state');
+
+            const { data: posts, error } = await fetchPublishedPosts(50);
+
+            loading.classList.add('hidden');
+
+            if (error) {
+                showError(container, 'Failed to load posts: ' + error.message);
+                return;
+            }
+
+            allPosts = posts || [];
+
+            if (allPosts.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            renderPosts(allPosts);
+        }
+
+        function renderPosts(posts) {
+            const container = document.getElementById('posts-container');
+            const emptyState = document.getElementById('empty-state');
+
+            if (posts.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = posts.map((post, i) => {
+                const author = post.profiles || {};
+                const reactionCount = post.reactions ? post.reactions.length : 0;
+                const commentCount = post.comments ? post.comments.length : 0;
+                const tags = (post.tags || []).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">#${t}</span>`).join('');
+
+                return `
+            <article class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm" style="animation-delay:${i * 0.05}s">
+                ${post.cover_image_url ? `<a href="post.html?id=${post.id}" class="block"><img class="w-full h-48 object-cover" alt="${post.title}" src="${post.cover_image_url}"/></a>` : ''}
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <img class="w-10 h-10 rounded-full object-cover" alt="${author.full_name || 'Author'}" src="${author.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author.full_name || 'U') + '&background=137fec&color=fff'}"/>
+                            <div>
+                                <h4 class="text-sm font-bold">${author.full_name || author.nickname || 'Anonymous'}</h4>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">${author.nickname ? '@' + author.nickname + ' • ' : ''}${timeAgo(post.created_at)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="post.html?id=${post.id}" class="block">
+                        <h2 class="text-xl font-bold mb-3 leading-snug hover:text-primary transition-colors cursor-pointer">${escapeHtml(post.title)}</h2>
+                    </a>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
+                    ${tags ? `<div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>` : ''}
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-6">
+                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+                                <span class="material-icons-round text-lg">favorite_border</span> ${reactionCount}
+                            </span>
+                            <span class="flex items-center gap-2 text-slate-500 text-xs font-semibold">
+                                <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
+                            </span>
+                        </div>
+                        <a href="post.html?id=${post.id}" class="text-xs font-bold text-primary hover:underline">Read more →</a>
+                    </div>
+                </div>
+            </article>`;
+            }).join('');
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) { renderPosts(allPosts); return; }
+            const filtered = allPosts.filter(p =>
+                p.title.toLowerCase().includes(query) ||
+                (p.tags || []).some(t => t.toLowerCase().includes(query)) ||
+                (p.profiles?.full_name || '').toLowerCase().includes(query)
+            );
+            renderPosts(filtered);
+        }
+
+        function filterByTag(tag) {
+            const filtered = allPosts.filter(p => (p.tags || []).includes(tag));
+            renderPosts(filtered.length > 0 ? filtered : allPosts);
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-all').className = tab === 'all'
+                ? 'text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1'
+                : 'text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors';
+            document.getElementById('tab-following').className = tab === 'following'
+                ? 'text-sm font-bold text-primary border-b-2 border-primary pb-3 px-1'
+                : 'text-sm font-medium text-slate-500 dark:text-slate-400 pb-3 px-1 hover:text-slate-900 dark:hover:text-white transition-colors';
+            renderPosts(allPosts);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function stripHtml(html) {
+            if (!html) return '';
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

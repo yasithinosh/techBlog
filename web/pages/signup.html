@@ -4,106 +4,33 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <title>Join inovoid | Technical Blog Platform</title>
-    <script>
-        if (localStorage.getItem('inovoid-theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
+    <link href="../css/main.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
                 },
             },
         }
     </script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .tech-grid {
-            background-image: radial-gradient(circle at 2px 2px, rgba(19, 127, 236, 0.15) 1px, transparent 0);
-            background-size: 32px 32px;
-        }
-
-        .glass-panel {
-            background: rgba(16, 25, 34, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(19, 127, 236, 0.2);
-        }
-
-        .dark .glass-panel {
-            background: rgba(16, 25, 34, 0.8);
-        }
-
-        html:not(.dark) .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(19, 127, 236, 0.15);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.5s ease-out both;
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .animate-scale-in {
-            animation: scaleIn 0.4s ease-out both;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body
     class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display tech-grid">
 
-    <!-- Navigation Header -->
+    <!-- Header -->
     <header class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
-        <a href="index.html" class="flex items-center gap-2">
+        <a href="../index.html" class="flex items-center gap-2">
             <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <span class="material-icons text-white">code</span>
             </div>
@@ -111,11 +38,11 @@
         </a>
         <div class="flex items-center gap-4">
             <a class="text-slate-500 hover:text-primary transition-colors text-sm font-medium hidden md:block"
-                href="feed.html">Browse Documentation</a>
+                href="feed.html">Browse Posts</a>
             <button onclick="toggleTheme()"
                 class="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-500 hover:text-primary"
                 title="Toggle theme">
-                <span class="material-icons text-sm" id="theme-icon">light_mode</span>
+                <span class="material-icons text-sm" data-theme-icon>light_mode</span>
             </button>
         </div>
     </header>
@@ -128,15 +55,19 @@
             <div class="relative z-10">
                 <h1 class="text-3xl font-bold mb-2">Create your account</h1>
                 <p class="text-slate-400 mb-8">Join the technical frontier and share your insights with the world.</p>
-                <form class="space-y-6" onsubmit="showVerification(event)">
+
+                <!-- Status messages -->
+                <div id="status-msg" class="mb-4"></div>
+
+                <form id="signup-form" class="space-y-6">
                     <div class="space-y-2">
                         <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Full Name</label>
                         <div class="relative">
                             <span
                                 class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">person</span>
-                            <input
+                            <input id="fullname"
                                 class="w-full bg-white dark:bg-background-dark/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                placeholder="John Doe" type="text" />
+                                placeholder="John Doe" type="text" required />
                         </div>
                     </div>
                     <div class="space-y-2">
@@ -144,9 +75,9 @@
                         <div class="relative">
                             <span
                                 class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">alternate_email</span>
-                            <input id="email-input"
+                            <input id="email"
                                 class="w-full bg-white dark:bg-background-dark/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                placeholder="john@company.com" type="email" />
+                                placeholder="john@company.com" type="email" required />
                         </div>
                     </div>
                     <div class="space-y-2">
@@ -154,13 +85,13 @@
                         <div class="relative">
                             <span
                                 class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">lock</span>
-                            <input
+                            <input id="password"
                                 class="w-full bg-white dark:bg-background-dark/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
-                                placeholder="••••••••" type="password" />
+                                placeholder="••••••••" type="password" required minlength="8" />
                         </div>
-                        <p class="text-xs text-slate-500">Must be at least 8 characters with one special symbol.</p>
+                        <p class="text-xs text-slate-500">Must be at least 8 characters.</p>
                     </div>
-                    <button type="submit"
+                    <button id="signup-btn" type="submit"
                         class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-4">
                         <span>Sign Up</span>
                         <span class="material-icons text-sm">arrow_forward</span>
@@ -169,7 +100,7 @@
                 <div class="mt-8 pt-6 border-t border-slate-300 dark:border-slate-800 text-center">
                     <p class="text-slate-500 dark:text-slate-400 text-sm">
                         Already have an account?
-                        <a class="text-primary hover:underline font-medium" href="feed.html">Log in</a>
+                        <a class="text-primary hover:underline font-medium" href="login.html">Log in</a>
                     </p>
                 </div>
             </div>
@@ -177,7 +108,7 @@
 
         <!-- Verification Overlay (Hidden by default) -->
         <div id="verification-overlay"
-            class="hidden absolute inset-0 bg-background-dark/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            class="hidden fixed inset-0 bg-background-dark/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div
                 class="animate-scale-in w-full max-w-md bg-white dark:bg-background-dark border border-primary/30 rounded-xl p-8 shadow-2xl text-center">
                 <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -186,60 +117,75 @@
                 <h2 class="text-2xl font-bold mb-3">Check your inbox</h2>
                 <p class="text-slate-500 dark:text-slate-400 mb-8 leading-relaxed">
                     We've sent a verification link to <span class="text-slate-900 dark:text-slate-100 font-medium"
-                        id="verify-email">john@company.com</span>. Please click the link to activate your inovoid
-                    account.
+                        id="verify-email">your email</span>. Please click the link to activate your inovoid account.
                 </p>
                 <div class="space-y-4">
-                    <button
-                        class="w-full bg-primary/10 hover:bg-primary/20 text-primary font-semibold py-3 rounded-lg transition-all">
-                        Resend Verification Email
-                    </button>
+                    <a href="login.html"
+                        class="block w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 rounded-lg transition-all text-center">
+                        Go to Login
+                    </a>
                     <button onclick="hideVerification()"
                         class="w-full text-slate-500 hover:text-slate-300 text-sm font-medium py-2 transition-colors">
-                        Change email address
+                        Sign up with different email
                     </button>
-                </div>
-                <div class="mt-8 flex justify-center gap-4">
-                    <div class="w-12 h-1 rounded-full bg-primary"></div>
-                    <div class="w-12 h-1 rounded-full bg-slate-300 dark:bg-slate-800"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Background Decoration -->
     <div class="fixed top-1/4 -left-20 w-64 h-64 bg-primary/5 blur-[120px] -z-10"></div>
     <div class="fixed bottom-1/4 -right-20 w-96 h-96 bg-primary/5 blur-[150px] -z-10"></div>
 
     <footer class="p-8 text-center text-slate-500 dark:text-slate-600 text-sm">
-        <div class="flex justify-center gap-6 mb-4">
-            <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
-            <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-            <a class="hover:text-primary transition-colors" href="#">Cookie Settings</a>
-        </div>
         <p>© 2025 inovoid. For the curious minds in tech.</p>
     </footer>
 
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
     <script>
-        // Theme
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('inovoid-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-            updateThemeIcon();
-        }
-        function updateThemeIcon() {
-            const icon = document.getElementById('theme-icon');
-            if (icon) icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
-        }
-        updateThemeIcon();
+        // Redirect if already logged in
+        redirectIfLoggedIn();
 
-        // Signup → Verification flow
-        function showVerification(e) {
+        // Signup form handler
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email-input').value || 'john@company.com';
-            document.getElementById('verify-email').textContent = email;
-            document.getElementById('verification-overlay').classList.remove('hidden');
-        }
+            const btn = document.getElementById('signup-btn');
+            const fullName = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (password.length < 8) {
+                showError(document.getElementById('status-msg'), 'Password must be at least 8 characters.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+
+            try {
+                console.log('[inovoid] Attempting signup for:', email);
+                const { data, error } = await signUp(email, password, fullName);
+                console.log('[inovoid] Signup result:', { data, error });
+
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Sign Up</span><span class="material-icons text-sm">arrow_forward</span>';
+                } else {
+                    // Show verification overlay
+                    document.getElementById('verify-email').textContent = email;
+                    document.getElementById('verification-overlay').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('[inovoid] Signup exception:', err);
+                showError(document.getElementById('status-msg'), 'Connection error: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span>Sign Up</span><span class="material-icons text-sm">arrow_forward</span>';
+            }
+        });
+
         function hideVerification() {
             document.getElementById('verification-overlay').classList.add('hidden');
         }

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+    <title>Create New Blog Post | inovoid</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display transition-colors duration-300">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <a href="../index.html" class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="material-icons-round text-white text-lg">bolt</span>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">inovoid</span>
+                </a>
+                <div class="hidden md:flex items-center space-x-2 text-slate-500 text-sm">
+                    <span class="material-icons-round text-sm">chevron_right</span>
+                    <a class="hover:text-primary transition-colors" href="feed.html">Dashboard</a>
+                    <span class="material-icons-round text-sm">chevron_right</span>
+                    <span class="text-slate-800 dark:text-slate-200 font-medium" id="breadcrumb-title">Create
+                        Post</span>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                    title="Toggle theme">
+                    <span class="material-icons-round text-sm" data-theme-icon>light_mode</span>
+                </button>
+                <span class="hidden md:block text-xs text-slate-500 italic" id="save-status"></span>
+                <button onclick="handlePreview()"
+                    class="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                    Preview
+                </button>
+                <button onclick="handleSave(false)" id="draft-btn"
+                    class="px-4 py-2 text-sm font-medium rounded-lg bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-all">
+                    Save Draft
+                </button>
+                <button onclick="handleSave(true)" id="publish-btn"
+                    class="px-6 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Publish
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+        <!-- Cover Image Upload -->
+        <div class="relative group mb-8">
+            <div id="cover-upload"
+                class="w-full h-64 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all overflow-hidden"
+                onclick="document.getElementById('cover-input').click()">
+                <img id="cover-preview" class="absolute inset-0 w-full h-full object-cover hidden"
+                    alt="Cover preview" />
+                <div id="cover-placeholder" class="relative z-10 flex flex-col items-center">
+                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                        <span class="material-icons-round text-primary">add_photo_alternate</span>
+                    </div>
+                    <p class="font-medium text-slate-700 dark:text-slate-300">Add a high-quality cover image</p>
+                    <p class="text-xs text-slate-500 mt-1">1600 x 840 recommended (PNG, JPG, WebP)</p>
+                </div>
+            </div>
+            <input type="file" id="cover-input" accept="image/*" class="hidden" onchange="handleCoverUpload(event)" />
+        </div>
+
+        <!-- Title Input -->
+        <div class="mb-6">
+            <textarea id="post-title"
+                class="w-full bg-transparent border-none focus:ring-0 text-4xl md:text-5xl font-bold placeholder:text-slate-300 dark:placeholder:text-slate-700 resize-none p-0 overflow-hidden"
+                oninput='this.style.height="";this.style.height=this.scrollHeight+"px"'
+                placeholder="Enter a catchy tech title..." rows="1"></textarea>
+        </div>
+
+        <!-- Tags Input -->
+        <div
+            class="mb-10 flex flex-wrap items-center gap-2 p-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800">
+            <div id="tags-container"></div>
+            <input id="tag-input"
+                class="bg-transparent border-none focus:ring-0 text-sm flex-grow min-w-[200px] text-slate-600 dark:text-slate-400"
+                placeholder="Add tags (press Enter)..." type="text" onkeydown="handleTagInput(event)" />
+        </div>
+
+        <!-- Editor Toolbar -->
+        <div
+            class="sticky top-20 z-40 mb-6 flex items-center justify-between p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl shadow-black/5">
+            <div class="flex items-center space-x-1">
+                <button onclick="execCmd('bold')"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Bold">
+                    <span class="material-icons-round text-xl">format_bold</span>
+                </button>
+                <button onclick="execCmd('italic')"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Italic">
+                    <span class="material-icons-round text-xl">format_italic</span>
+                </button>
+                <button onclick="execCmd('insertUnorderedList')"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Bullet List">
+                    <span class="material-icons-round text-xl">format_list_bulleted</span>
+                </button>
+                <div class="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                <button onclick="execCmd('createLink', prompt('Enter URL:'))"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Link">
+                    <span class="material-icons-round text-xl">link</span>
+                </button>
+                <button onclick="insertCodeBlock()"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Code Block">
+                    <span class="material-icons-round text-xl">code</span>
+                </button>
+                <button onclick="execCmd('formatBlock', 'h2')"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Heading">
+                    <span class="material-icons-round text-xl">title</span>
+                </button>
+                <button onclick="execCmd('formatBlock', 'blockquote')"
+                    class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-slate-600 dark:text-slate-400"
+                    title="Quote">
+                    <span class="material-icons-round text-xl">format_quote</span>
+                </button>
+            </div>
+            <span class="text-xs text-slate-500 font-medium hidden sm:inline px-2">Rich Text Editor</span>
+        </div>
+
+        <!-- Editor Body -->
+        <div class="min-h-[500px] mb-12">
+            <div id="post-content"
+                class="editor-content outline-none text-lg leading-relaxed text-slate-700 dark:text-slate-300 max-w-none min-h-[400px]"
+                contenteditable="true" data-placeholder="Write your technical masterpiece here..."></div>
+        </div>
+    </main>
+
+    <!-- Footer Stats Bar -->
+    <div
+        class="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 h-12 flex items-center justify-between text-xs font-medium text-slate-500">
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-1">
+                    <span class="material-icons-round text-sm">article</span>
+                    <span id="word-count">0 Words</span>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <span class="material-icons-round text-sm">timer</span>
+                    <span id="read-time">0 Min Read</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed top-0 left-0 -z-10 w-full h-full overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[30%] h-[30%] bg-primary/5 blur-[100px] rounded-full"></div>
+    </div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        let currentUser = null;
+        let editingPostId = null;
+        let coverFile = null;
+        let tags = [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+
+        async function init() {
+            currentUser = await requireAuth();
+            if (!currentUser) return;
+
+            if (editId) {
+                document.getElementById('breadcrumb-title').textContent = 'Edit Post';
+                document.title = 'Edit Post | inovoid';
+                await loadPostForEdit(editId);
+            }
+
+            // Word count updater
+            document.getElementById('post-content').addEventListener('input', updateStats);
+        }
+
+        async function loadPostForEdit(postId) {
+            const { data: post, error } = await fetchPostById(postId);
+            if (error || !post || post.author_id !== currentUser.id) {
+                showToast('Post not found or unauthorized', 'error');
+                return;
+            }
+            editingPostId = post.id;
+            document.getElementById('post-title').value = post.title;
+            document.getElementById('post-content').innerHTML = post.content;
+            tags = post.tags || [];
+            renderTags();
+            if (post.cover_image_url) {
+                document.getElementById('cover-preview').src = post.cover_image_url;
+                document.getElementById('cover-preview').classList.remove('hidden');
+                document.getElementById('cover-placeholder').classList.add('hidden');
+            }
+            updateStats();
+        }
+
+        function handleCoverUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            coverFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('cover-preview').src = e.target.result;
+                document.getElementById('cover-preview').classList.remove('hidden');
+                document.getElementById('cover-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleTagInput(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const tag = e.target.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (tag && !tags.includes(tag) && tags.length < 5) {
+                    tags.push(tag);
+                    renderTags();
+                }
+                e.target.value = '';
+            }
+        }
+
+        function removeTag(tag) {
+            tags = tags.filter(t => t !== tag);
+            renderTags();
+        }
+
+        function renderTags() {
+            document.getElementById('tags-container').innerHTML = tags.map(t =>
+                `<div class="flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium border border-primary/20">
+                <span>#${t}</span>
+                <button onclick="removeTag('${t}')" class="material-icons-round text-sm hover:text-red-400">close</button>
+            </div>`
+            ).join('');
+        }
+
+        async function handleSave(publish) {
+            const title = document.getElementById('post-title').value.trim();
+            const content = document.getElementById('post-content').innerHTML.trim();
+
+            if (!title) { showToast('Please enter a title', 'warning'); return; }
+            if (!content || content === '<br>') { showToast('Please write some content', 'warning'); return; }
+
+            const btn = publish ? document.getElementById('publish-btn') : document.getElementById('draft-btn');
+            btn.disabled = true;
+            btn.textContent = publish ? 'Publishing...' : 'Saving...';
+
+            let coverUrl = editingPostId ? undefined : '';
+
+            // Upload cover image if new
+            if (coverFile) {
+                const { url, error } = await uploadPostCover(currentUser.id, coverFile);
+                if (error) { showToast('Cover upload failed: ' + error.message, 'error'); btn.disabled = false; return; }
+                coverUrl = url;
+            }
+
+            const postData = {
+                title,
+                content,
+                tags,
+                published: publish,
+                ...(coverUrl !== undefined && { cover_image_url: coverUrl })
+            };
+
+            let result;
+            if (editingPostId) {
+                result = await updatePost(editingPostId, postData);
+            } else {
+                postData.author_id = currentUser.id;
+                result = await createPost(postData);
+            }
+
+            if (result.error) {
+                showToast('Failed to save: ' + result.error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = publish ? 'Publish' : 'Save Draft';
+            } else {
+                showToast(publish ? 'Published!' : 'Draft saved!', 'success');
+                setTimeout(() => {
+                    window.location.href = publish ? `post.html?id=${result.data.id}` : 'feed.html';
+                }, 1000);
+            }
+        }
+
+        function handlePreview() {
+            if (editingPostId) {
+                window.open(`post.html?id=${editingPostId}`, '_blank');
+            } else {
+                showToast('Save as draft first to preview', 'info');
+            }
+        }
+
+        function execCmd(command, value = null) {
+            document.execCommand(command, false, value);
+            document.getElementById('post-content').focus();
+        }
+
+        function insertCodeBlock() {
+            document.execCommand('insertHTML', false, '<pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-sm border border-slate-800 my-4"><code>// Your code here</code></pre><br>');
+        }
+
+        function updateStats() {
+            const text = document.getElementById('post-content').innerText || '';
+            const words = text.split(/\s+/).filter(w => w.length > 0).length;
+            const minutes = Math.max(1, Math.ceil(words / 200));
+            document.getElementById('word-count').textContent = `${words} Words`;
+            document.getElementById('read-time').textContent = `${minutes} Min Read`;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

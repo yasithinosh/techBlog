@@ -5,105 +5,25 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Inovoid | Technical Blogging Platform</title>
-    <script>
-        if (localStorage.getItem('inovoid-theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script id="tailwind-config">
+    <link href="css/main.css" rel="stylesheet" />
+    <script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
-                    colors: {
-                        "primary": "#137fec",
-                        "background-light": "#f6f7f8",
-                        "background-dark": "#101922",
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
                 },
             },
         }
     </script>
-    <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-        }
 
-        .hero-gradient {
-            background: radial-gradient(circle at 50% 50%, rgba(19, 127, 236, 0.15) 0%, transparent 70%);
-        }
-
-        .grid-pattern {
-            background-image: radial-gradient(rgba(19, 127, 236, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeInUp 0.5s ease-out both;
-        }
-
-        .animate-fade-in-delay-1 {
-            animation: fadeInUp 0.5s ease-out 0.1s both;
-        }
-
-        .animate-fade-in-delay-2 {
-            animation: fadeInUp 0.5s ease-out 0.2s both;
-        }
-
-        .animate-fade-in-delay-3 {
-            animation: fadeInUp 0.5s ease-out 0.3s both;
-        }
-
-        /* Mobile menu overlay */
-        .mobile-menu-overlay {
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .mobile-menu-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .mobile-menu-overlay:not(.hidden) {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .mobile-menu-panel {
-            transition: transform 0.3s ease;
-        }
-
-        .mobile-menu-overlay.hidden .mobile-menu-panel {
-            transform: translateX(100%);
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body
@@ -121,17 +41,25 @@
                     <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">inovoid</span>
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="feed.html">Feed</a>
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="feed.html">Explore</a>
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Changelog</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="pages/feed.html">Feed</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors"
+                        href="pages/feed.html">Explore</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="#">About</a>
                     <div class="h-4 w-[1px] bg-slate-300 dark:bg-slate-700"></div>
-                    <a class="text-sm font-medium hover:text-primary transition-colors" href="signup.html">Login</a>
-                    <a href="signup.html"
+                    <!-- Logged out links -->
+                    <a data-auth="logged-out" class="text-sm font-medium hover:text-primary transition-colors"
+                        href="pages/login.html">Login</a>
+                    <a data-auth="logged-out" href="pages/signup.html"
                         class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary/20">
                         Get Started
                     </a>
+                    <!-- Logged in links -->
+                    <a data-auth="logged-in" href="pages/feed.html"
+                        class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary/20"
+                        style="display:none">
+                        Go to Dashboard
+                    </a>
                 </div>
-                <!-- Mobile menu button -->
                 <button onclick="toggleMobileMenu()"
                     class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                     <span class="material-icons">menu</span>
@@ -140,7 +68,7 @@
         </div>
     </nav>
 
-    <!-- Mobile Menu Overlay -->
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu-overlay hidden fixed inset-0 z-[100]">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
         <div
@@ -152,34 +80,34 @@
                 </button>
             </div>
             <nav class="flex flex-col space-y-2 flex-1">
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">dynamic_feed</span> Feed
                 </a>
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">explore</span> Explore
                 </a>
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
-                    <span class="material-icons text-lg">history</span> Changelog
-                </a>
                 <div class="border-t border-slate-200 dark:border-slate-800 my-4"></div>
-                <a href="signup.html"
+                <a data-auth="logged-out" href="pages/login.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all font-medium">
                     <span class="material-icons text-lg">login</span> Login
                 </a>
-                <a href="signup.html"
+                <a data-auth="logged-out" href="pages/signup.html"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary text-white font-semibold justify-center mt-2">
                     Get Started
                 </a>
+                <a data-auth="logged-in" href="pages/feed.html"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary text-white font-semibold justify-center mt-2"
+                    style="display:none">
+                    Dashboard
+                </a>
             </nav>
-            <!-- Theme Toggle -->
             <div class="border-t border-slate-200 dark:border-slate-800 pt-4 mt-4">
                 <button onclick="toggleTheme()"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all w-full font-medium">
-                    <span class="material-icons text-lg" id="mobile-theme-icon">light_mode</span>
-                    <span id="mobile-theme-label">Light Mode</span>
+                    <span class="material-icons text-lg" data-theme-icon>light_mode</span>
+                    <span data-theme-label>Light Mode</span>
                 </button>
             </div>
         </div>
@@ -210,88 +138,77 @@
                 community of engineers.
             </p>
             <div class="animate-fade-in-delay-3 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="signup.html"
+                <a href="pages/signup.html"
                     class="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-lg shadow-xl shadow-primary/25 transition-transform hover:-translate-y-1 text-center">
                     Start Writing Now
                 </a>
-                <a href="feed.html"
+                <a href="pages/feed.html"
                     class="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary text-slate-900 dark:text-white rounded-xl font-bold text-lg transition-all text-center">
                     Explore Community
                 </a>
             </div>
-            <div class="mt-20 relative animate-fade-in-delay-3">
-                <div class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-xl blur opacity-20">
-                </div>
-                <div
-                    class="relative bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
-                    <img class="w-full h-auto opacity-90" alt="Code editor showing technical blog post content"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlC0h7vbDrDV8ZAfbrC2rk1iEfZSx68pxa72ZgRroWeO7BnFn2yH4-RDC8BXA8-2M6w8GfOtx9FoeE0OAf4Lm9uj5OQlQZM4MYEHelUm-3CqlyjBq5yzgJ18VRc4NXeHZPt23niJsqc2R4_39jUkbAaVEu34kjROS1ml0hDvZNfNKo9HBsZ61rdyxWWJUhQoV1qd1S1RArFVSDO6hnfvxjmUwTwQGwEoI7hitVIdNYEfWaPACWHUDhcESh15Kw7EEiSYea-bRyFr3W" />
-                </div>
-            </div>
         </div>
     </main>
 
-    <!-- Why inovoid? Section -->
+    <!-- What is inovoid? Section -->
     <section class="py-24 bg-slate-50 dark:bg-slate-900/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Why inovoid?</h2>
-                <p class="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">Built by developers, for developers. We
-                    focused on what matters most for technical communication.</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">What is inovoid?</h2>
+                <p class="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">A platform built by developers, for
+                    developers. We focused on what matters most for technical communication.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
                 <div
                     class="p-8 rounded-2xl bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-all group hover:-translate-y-1 duration-300">
                     <div
                         class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                        <span class="material-icons text-primary group-hover:text-white">groups</span>
+                        <span class="material-icons text-primary group-hover:text-white">edit_note</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Community First</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Connect with thousands of like-minded engineers.
-                        Engagement that matters beyond simple likes.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Share & Publish</h3>
+                    <p class="text-slate-600 dark:text-slate-400">Write technical blog posts, tutorials, and deep-dives.
+                        Share your knowledge and expertise with the world.</p>
                 </div>
-                <!-- Card 2 -->
                 <div
                     class="p-8 rounded-2xl bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-all group hover:-translate-y-1 duration-300">
                     <div
                         class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                        <span class="material-icons text-primary group-hover:text-white">data_object</span>
+                        <span class="material-icons text-primary group-hover:text-white">forum</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Technical Depth</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Native Markdown support, syntax highlighting for 100+
-                        languages, and LaTeX math typesetting built-in.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">React & Discuss</h3>
+                    <p class="text-slate-600 dark:text-slate-400">Like, comment, and share posts. Engage in meaningful
+                        technical discussions with fellow engineers.</p>
                 </div>
-                <!-- Card 3 -->
                 <div
                     class="p-8 rounded-2xl bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-all group hover:-translate-y-1 duration-300">
                     <div
                         class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary transition-colors">
-                        <span class="material-icons text-primary group-hover:text-white">auto_awesome</span>
+                        <span class="material-icons text-primary group-hover:text-white">person</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Open Knowledge</h3>
-                    <p class="text-slate-600 dark:text-slate-400">Free to read, easy to share, impossible to ignore.
-                        Your technical insights deserve a global stage.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-3">Your Profile</h3>
+                    <p class="text-slate-600 dark:text-slate-400">Customize your profile with bio, nickname, and avatar.
+                        Build your personal brand as a technical writer.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Deep Dive CTA Section -->
+    <!-- CTA Section -->
     <section class="py-24 relative overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative rounded-3xl bg-primary px-8 py-16 text-center overflow-hidden">
                 <div class="absolute inset-0 opacity-10">
-                    <img class="w-full h-full object-cover" alt="Abstract cyber pattern"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfak_bdYUc26EAxXEqLh076Egz5jFF1VSRrCGp71GHS5hIQNmIJrztgedl7rOw0aiiRt8CkuvBIVDTREvk6pdTu_O_7yaXC8ETLz2WVOEPt2KjC95EuoJ9gzmFfCkiF-pvI7D-GUc-WndxHnkPEHC02KbTltE8yRKT9mrTLsOeEpJKMvj53sccpUJ6b8Wfq8quRhYjoT8P8LDIQdkdIeHLfOQSgPAOZZYhlgIeM8W3jjGV4E6G_ixh3K_g2klOxZpafuDg1YmYTWDB" />
+                    <div class="w-full h-full"
+                        style="background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 24px 24px;">
+                    </div>
                 </div>
                 <div class="relative z-10">
                     <h2 class="text-3xl md:text-5xl font-bold text-white mb-6 italic">Ready to contribute to the void?
                     </h2>
                     <p class="text-white/80 text-lg mb-10 max-w-2xl mx-auto">
-                        Join 50,000+ developers sharing their journey. No paywalls, no clutter, just pure engineering.
+                        Join developers sharing their journey. No paywalls, no clutter, just pure engineering.
                     </p>
-                    <a href="signup.html"
+                    <a href="pages/signup.html"
                         class="inline-block bg-white text-primary hover:bg-slate-100 px-10 py-4 rounded-xl font-bold text-lg transition-all shadow-2xl">
                         Create Your Free Account
                     </a>
@@ -313,48 +230,27 @@
                 <div class="flex flex-wrap justify-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
                     <a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
                     <a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
-                    <a class="hover:text-primary transition-colors" href="#">Cookie Policy</a>
                     <a class="hover:text-primary transition-colors" href="#">Contact</a>
                 </div>
-                <div class="flex gap-4">
-                    <!-- Theme toggle button (desktop) -->
-                    <button onclick="toggleTheme()"
-                        class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-600 dark:text-slate-400 hover:text-primary"
-                        title="Toggle theme">
-                        <span class="material-icons text-lg" id="desktop-theme-icon">light_mode</span>
-                    </button>
-                    <a class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-600 dark:text-slate-400 hover:text-primary"
-                        href="#">
-                        <span class="material-icons text-lg">code</span>
-                    </a>
-                </div>
+                <button onclick="toggleTheme()"
+                    class="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-600 dark:text-slate-400 hover:text-primary"
+                    title="Toggle theme">
+                    <span class="material-icons text-lg" data-theme-icon>light_mode</span>
+                </button>
             </div>
             <div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800/50 text-center">
-                <p class="text-slate-500 dark:text-slate-500 text-sm">
-                    © 2025 inovoid. All rights reserved. Engineering better connections.
-                </p>
+                <p class="text-slate-500 dark:text-slate-500 text-sm">© 2025 inovoid. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
+    <script src="js/theme.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        // Theme toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            html.classList.toggle('dark');
-            const isDark = html.classList.contains('dark');
-            localStorage.setItem('inovoid-theme', isDark ? 'dark' : 'light');
-            updateThemeIcons();
-        }
-
-        function updateThemeIcons() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const icons = document.querySelectorAll('#desktop-theme-icon, #mobile-theme-icon');
-            icons.forEach(icon => { icon.textContent = isDark ? 'light_mode' : 'dark_mode'; });
-            const label = document.getElementById('mobile-theme-label');
-            if (label) label.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-        }
-        updateThemeIcons();
+        // Update nav based on auth state
+        updateNavAuth();
 
         // Mobile menu
         function toggleMobileMenu() {

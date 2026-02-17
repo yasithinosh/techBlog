@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <title>Login | inovoid</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display tech-grid">
+
+    <!-- Header -->
+    <header class="p-6 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <a href="../index.html" class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <span class="material-icons text-white">code</span>
+            </div>
+            <span class="text-2xl font-bold tracking-tight">inovoid</span>
+        </a>
+        <div class="flex items-center gap-4">
+            <a class="text-slate-500 hover:text-primary transition-colors text-sm font-medium hidden md:block"
+                href="feed.html">Browse Posts</a>
+            <button onclick="toggleTheme()"
+                class="w-9 h-9 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-500 hover:text-primary"
+                title="Toggle theme">
+                <span class="material-icons text-sm" data-theme-icon>light_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 relative">
+        <div
+            class="animate-fade-in w-full max-w-lg glass-panel p-8 md:p-12 rounded-xl shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+            <div class="relative z-10">
+                <h1 class="text-3xl font-bold mb-2">Welcome back</h1>
+                <p class="text-slate-400 mb-8">Sign in to continue sharing your technical insights.</p>
+
+                <!-- Status messages -->
+                <div id="status-msg" class="mb-4"></div>
+
+                <form id="login-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Email Address</label>
+                        <div class="relative">
+                            <span
+                                class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">alternate_email</span>
+                            <input id="email"
+                                class="w-full bg-white dark:bg-background-dark/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                placeholder="john@company.com" type="email" required />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm font-medium text-slate-600 dark:text-slate-300">Password</label>
+                            <a href="#" class="text-xs text-primary hover:underline" id="forgot-link">Forgot
+                                password?</a>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">lock</span>
+                            <input id="password"
+                                class="w-full bg-white dark:bg-background-dark/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                placeholder="••••••••" type="password" required />
+                        </div>
+                    </div>
+                    <button id="login-btn" type="submit"
+                        class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 mt-4">
+                        <span>Sign In</span>
+                        <span class="material-icons text-sm">arrow_forward</span>
+                    </button>
+                </form>
+                <div class="mt-8 pt-6 border-t border-slate-300 dark:border-slate-800 text-center">
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">
+                        Don't have an account?
+                        <a class="text-primary hover:underline font-medium" href="signup.html">Create one</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Background Decorations -->
+    <div class="fixed top-1/4 -left-20 w-64 h-64 bg-primary/5 blur-[120px] -z-10"></div>
+    <div class="fixed bottom-1/4 -right-20 w-96 h-96 bg-primary/5 blur-[150px] -z-10"></div>
+
+    <footer class="p-8 text-center text-slate-500 dark:text-slate-600 text-sm">
+        <p>© 2025 inovoid. For the curious minds in tech.</p>
+    </footer>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        // Redirect if already logged in
+        redirectIfLoggedIn();
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
+
+            try {
+                console.log('[inovoid] Attempting login for:', email);
+                const { data, error } = await signIn(email, password);
+                console.log('[inovoid] Login result:', { data, error });
+
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<span>Sign In</span><span class="material-icons text-sm">arrow_forward</span>';
+                } else {
+                    showSuccess(document.getElementById('status-msg'), 'Logged in! Redirecting...');
+                    setTimeout(() => window.location.href = 'feed.html', 1000);
+                }
+            } catch (err) {
+                console.error('[inovoid] Login exception:', err);
+                showError(document.getElementById('status-msg'), 'Connection error: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span>Sign In</span><span class="material-icons text-sm">arrow_forward</span>';
+            }
+        });
+
+        // Forgot password handler
+        document.getElementById('forgot-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                showError(document.getElementById('status-msg'), 'Enter your email first, then click Forgot Password.');
+                return;
+            }
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                if (error) {
+                    showError(document.getElementById('status-msg'), error.message);
+                } else {
+                    showSuccess(document.getElementById('status-msg'), `Password reset link sent to ${email}`);
+                }
+            } catch (err) {
+                showError(document.getElementById('status-msg'), 'Error: ' + err.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
