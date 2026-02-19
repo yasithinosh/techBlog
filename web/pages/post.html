@@ -227,9 +227,21 @@
         const postId = urlParams.get('id');
 
         async function loadPost() {
+            console.log('loadPost called for ID:', postId);
             if (!postId) {
+                console.error('No Post ID found in URL parameters');
                 document.getElementById('post-loading').classList.add('hidden');
-                document.getElementById('post-error').classList.remove('hidden');
+                const errorDiv = document.getElementById('post-error');
+                errorDiv.classList.remove('hidden');
+                errorDiv.querySelector('h2').textContent = 'Missing Post ID';
+                errorDiv.querySelector('p').textContent = 'No ID parameter found in the URL.';
+
+                errorDiv.innerHTML += `
+                    <div class="mt-4 p-3 bg-slate-900 text-slate-300 rounded font-mono text-xs text-left overflow-x-auto">
+                        <p><strong>Debug Info (No ID):</strong></p>
+                        <p>URL: ${window.location.href}</p>
+                        <p>Search: ${window.location.search}</p>
+                    </div>`;
                 return;
             }
 
@@ -241,7 +253,18 @@
             document.getElementById('post-loading').classList.add('hidden');
 
             if (error || !post) {
-                document.getElementById('post-error').classList.remove('hidden');
+                console.error('Fetch error:', error);
+                const errorDiv = document.getElementById('post-error');
+                errorDiv.classList.remove('hidden');
+                errorDiv.querySelector('p').textContent = error ? error.message : 'Post not found (null data)';
+                // detailed Debug info
+                errorDiv.innerHTML += `
+                    <div class="mt-4 p-3 bg-slate-900 text-slate-300 rounded font-mono text-xs text-left overflow-x-auto">
+                        <p><strong>Debug Info:</strong></p>
+                        <p>URL: ${window.location.href}</p>
+                        <p>Raw ID Arg: "${postId}" (Type: ${typeof postId})</p>
+                        <p>Fetch Error: ${error ? JSON.stringify(error) : 'None'}</p>
+                    </div>`;
                 return;
             }
 
@@ -266,10 +289,13 @@
             });
 
             // Author info
-            if (post.profiles) {
-                document.getElementById('author-name').textContent = post.profiles.full_name || post.profiles.nickname;
-                if (post.profiles.avatar_url) {
-                    document.getElementById('author-avatar').src = post.profiles.avatar_url;
+            let author = post.profiles;
+            if (Array.isArray(author)) author = author[0]; // Handle array case
+
+            if (author) {
+                document.getElementById('author-name').textContent = author.full_name || author.nickname || 'Anonymous';
+                if (author.avatar_url) {
+                    document.getElementById('author-avatar').src = author.avatar_url;
                 }
             }
 
@@ -296,9 +322,7 @@
             document.getElementById('comment-count').textContent = commentCount;
             document.getElementById('comment-total').textContent = `(${commentCount})`;
 
-            // Load comments
-            await loadComments();
-
+            // Unhide content FIRST to ensure post is visible even if comments fail
             document.getElementById('post-content').classList.remove('hidden');
 
             // Handle hash scroll after content load
@@ -306,8 +330,30 @@
                 setTimeout(() => {
                     const el = document.querySelector(window.location.hash);
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }, 500); // Slight delay to ensure layout is stable
+                }, 500);
             }
+
+            // Load comments safely
+            try {
+                await loadComments();
+            } catch (err) {
+                console.error('Failed to load comments:', err);
+            }
+        }
+
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 7) return date.toLocaleDateString();
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return 'Just now';
         }
 
         async function loadComments() {

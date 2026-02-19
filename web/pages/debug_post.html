@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Post Fetch</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4
+        }
+
+        input,
+        button {
+            padding: 8px;
+            font-size: 14px;
+            background: #333;
+            color: #fff;
+            border: 1px solid #555
+        }
+
+        pre {
+            background: #000;
+            padding: 10px;
+            overflow: auto
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Debug Post Fetch</h1>
+    <div>
+        <input type="text" id="postIdInput" placeholder="Enter Post ID" style="width:300px">
+        <button onclick="runDebug()">Fetch Post</button>
+    </div>
+    <div id="status" style="margin-top:20px;color:yellow">Ready</div>
+    <pre id="output"></pre>
+
+    <script>
+        // Try to pre-fill from URL
+        const params = new URLSearchParams(window.location.search);
+        const idFromUrl = params.get('id');
+        if (idFromUrl) document.getElementById('postIdInput').value = idFromUrl;
+
+        async function runDebug() {
+            const id = document.getElementById('postIdInput').value.trim();
+            const out = document.getElementById('output');
+            const status = document.getElementById('status');
+
+            if (!id) { status.textContent = "Please enter an ID"; return; }
+
+            status.textContent = "Fetching...";
+            out.textContent = "Loading...";
+
+            try {
+                const { data, error } = await fetchPostById(id);
+
+                if (error) {
+                    status.textContent = "Error Returned";
+                    status.style.color = "red";
+                    out.textContent = JSON.stringify(error, null, 2);
+                } else if (!data) {
+                    status.textContent = "Success but Data is NULL";
+                    status.style.color = "orange";
+                    out.textContent = "Data is null";
+                } else {
+                    status.textContent = "Success";
+                    status.style.color = "#4caf50";
+                    out.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (err) {
+                status.textContent = "Exception Thrown";
+                status.style.color = "red";
+                out.textContent = err.toString();
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+
+</html>

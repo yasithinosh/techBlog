@@ -289,9 +289,7 @@
                             </div>
                         </div>
                     </div>
-                    <a href="post.html?id=${post.id}" class="block">
-                        <h2 class="text-xl font-bold mb-3 leading-snug hover:text-primary transition-colors cursor-pointer">${escapeHtml(post.title)}</h2>
-                    </a>
+                    <h2 class="text-xl font-bold mb-3 leading-snug text-slate-900 dark:text-slate-100">${escapeHtml(post.title)}</h2>
                     <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
                     ${tags ? `<div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>` : ''}
                     <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
