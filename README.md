@@ -31,44 +31,23 @@ A dedicated space for developers to share deep-dives, tutorials, and technical i
 ```
 
 ### Feed / Dashboard
-<!-- Replace this block with: ![Feed](docs/screenshots/feed.png) -->
+![Feed](docs/screenshots/feed.png)
 ```
 📷  docs/screenshots/feed.png
      → Main blog post feed with post cards
 ```
 
-### Post View
-<!-- Replace this block with: ![Post View](docs/screenshots/post.png) -->
-```
-📷  docs/screenshots/post.png
-     → Single post view with comments and reactions
-```
-
-### Create Post
-<!-- Replace this block with: ![Create Post](docs/screenshots/create.png) -->
-```
-📷  docs/screenshots/create.png
-     → Rich text editor for writing new blog posts
-```
-
 ### User Profile
-<!-- Replace this block with: ![Profile](docs/screenshots/profile.png) -->
+![Profile](docs/screenshots/profile.png)
 ```
 📷  docs/screenshots/profile.png
      → User profile page with avatar, bio, and posts
 ```
 
-### Bookmarks
-<!-- Replace this block with: ![Bookmarks](docs/screenshots/bookmarks.png) -->
-```
-📷  docs/screenshots/bookmarks.png
-     → Saved/bookmarked posts collection
-```
-
 ### Settings
-<!-- Replace this block with: ![Settings](docs/screenshots/settings.png) -->
+![Settings](docs/screenshots/setting.png)
 ```
-📷  docs/screenshots/settings.png
+📷  docs/screenshots/setting.png
      → Account settings with dark/light theme toggle
 ```
 
