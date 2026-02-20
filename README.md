@@ -2,7 +2,7 @@
 
 <img src="web/assets/favicon.svg" alt="Inovoid Logo" width="64" height="64" />
 
-# Inovoid
+# InoVoidBlog
 
 ### A Modern Technical Blogging Platform
 
