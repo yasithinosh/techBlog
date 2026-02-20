@@ -24,12 +24,12 @@ A dedicated space for developers to share deep-dives, tutorials, and technical i
 
 
 ### Landing Page
+![Landing Page](docs/screenshots/landing.png)
+```
 📷  docs/screenshots/landing.png
      → Landing page hero section (dark/light mode)
 ```
 
-![Landing Page](docs/screenshots/landing.png)
-```
 ### Feed / Dashboard
 <!-- Replace this block with: ![Feed](docs/screenshots/feed.png) -->
 ```
