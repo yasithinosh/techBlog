@@ -14,7 +14,7 @@
 
 A dedicated space for developers to share deep-dives, tutorials, and technical insights with a global community of engineers. No paywalls, no clutter — just pure engineering.
 
-[**🌐 Live Demo**](https://delightful-mud-06427dc00.azurestaticapps.net) · [**📋 Report a Bug**](../../issues) · [**💡 Request a Feature**](../../issues)
+[**🌐 Live Demo**](https://techblog.inovoid.me/) · [**📋 Report a Bug**](../../issues) · [**💡 Request a Feature**](../../issues)
 
 </div>
 
@@ -22,10 +22,9 @@ A dedicated space for developers to share deep-dives, tutorials, and technical i
 
 ## 📸 Screenshots
 
-> **How to add screenshots:** Take screenshots of each page, save them to `docs/screenshots/`, then replace the placeholder blocks below.
 
 ### Landing Page
-<!-- Replace this block with: ![Landing Page](docs/screenshots/landing.png) -->
+![Landing Page](docs/screenshots/landing.png)
 ```
 📷  docs/screenshots/landing.png
      → Landing page hero section (dark/light mode)
