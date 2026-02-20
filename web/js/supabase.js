@@ -320,3 +320,35 @@ function subscribeToNotifications(userId, callback) {
         })
         .subscribe();
 }
+
+// --- BOOKMARKS ---
+async function fetchUserBookmarks(userId) {
+    const { data, error } = await supabaseClient
+        .from('bookmarks')
+        .select('post_id')
+        .eq('user_id', userId);
+    return { data, error };
+}
+
+async function toggleBookmark(postId, userId) {
+    // Check if already bookmarked
+    const { data: existing } = await supabaseClient
+        .from('bookmarks')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+    if (existing) {
+        const { error } = await supabaseClient
+            .from('bookmarks')
+            .delete()
+            .eq('id', existing.id);
+        return { bookmarked: false, error };
+    } else {
+        const { error } = await supabaseClient
+            .from('bookmarks')
+            .insert({ post_id: postId, user_id: userId });
+        return { bookmarked: true, error };
+    }
+}
