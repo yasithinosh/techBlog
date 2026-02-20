@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <title>Inovoid — Bookmarks</title>
+    <link href="../css/main.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#137fec", "background-light": "#f6f7f8", "background-dark": "#101922" },
+                    fontFamily: { "display": ["Space Grotesk"] },
+                },
+            },
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div class="max-w-[1440px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <a href="../index.html" class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                    <span class="material-icons-round text-white text-2xl">terminal</span>
+                </div>
+                <span
+                    class="text-2xl font-bold tracking-tighter text-slate-900 dark:text-white uppercase hidden sm:inline">Inovoid</span>
+            </a>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()"
+                    class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                    title="Toggle theme">
+                    <span class="material-icons-round" data-theme-icon>light_mode</span>
+                </button>
+                <a href="create.html"
+                    class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-primary/20">
+                    <span class="material-icons-round text-xl">add_circle</span>
+                    <span class="hidden sm:inline">Create Post</span>
+                </a>
+                <!-- Notification Bell -->
+                <div class="relative" data-auth="logged-in">
+                    <button id="notif-btn" onclick="toggleNotifications()"
+                        class="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-all text-slate-500 hover:text-primary relative">
+                        <span class="material-icons-round text-lg">notifications</span>
+                        <span id="notif-badge"
+                            class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 text-[10px] text-white flex items-center justify-center leading-none"></span>
+                    </button>
+                    <!-- Notification Dropdown -->
+                    <div id="notif-panel"
+                        class="hidden absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in">
+                        <div
+                            class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+                            <h3 class="font-bold text-sm">Notifications</h3>
+                            <button onclick="markAllRead()" class="text-xs text-primary hover:underline">Mark all
+                                read</button>
+                        </div>
+                        <div id="notif-list" class="max-h-80 overflow-y-auto bg-white dark:bg-background-dark">
+                            <div class="p-8 text-center text-slate-500 text-xs">No notifications yet</div>
+                        </div>
+                    </div>
+                </div>
+                <a href="profile.html"
+                    class="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-slate-200 dark:ring-slate-800 p-0.5 block">
+                    <img data-auth-avatar class="w-full h-full object-cover rounded-lg" alt="User avatar"
+                        src="https://ui-avatars.com/api/?name=U&background=137fec&color=fff" />
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <!-- Sidebar (Left) -->
+        <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-8">
+            <nav class="space-y-1">
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="feed.html">
+                    <span class="material-icons-round">dynamic_feed</span> My Feed
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="#">
+                    <span class="material-icons-round">bolt</span> Latest
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50 rounded-xl font-medium transition-colors"
+                    href="#">
+                    <span class="material-icons-round">trending_up</span> Trending
+                </a>
+                <a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium"
+                    href="bookmarks.html">
+                    <span class="material-icons-round">bookmarks</span> Bookmarks
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="lg:col-span-6 space-y-6">
+            <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+                <span class="material-icons-round text-primary text-2xl">bookmarks</span>
+                <div>
+                    <h1 class="text-xl font-bold">Saved Bookmarks</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Posts you've bookmarked for later</p>
+                </div>
+            </div>
+
+            <!-- Posts container -->
+            <div id="posts-container">
+                <!-- Loading -->
+                <div id="posts-loading" class="flex justify-center py-12">
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce"></div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.15s">
+                        </div>
+                        <div class="w-2 h-2 rounded-full bg-primary animate-bounce" style="animation-delay:-0.3s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="hidden text-center py-16">
+                <span
+                    class="material-icons-round text-6xl text-slate-300 dark:text-slate-700 mb-4 block">bookmark_border</span>
+                <h3 class="text-xl font-bold mb-2">No bookmarks yet</h3>
+                <p class="text-slate-500 mb-6">Save posts to read them later from your feed.</p>
+                <a href="feed.html"
+                    class="inline-block px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-all">Browse
+                    Feed</a>
+            </div>
+        </section>
+
+        <!-- Right Panel -->
+        <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-6">
+            <div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+                <h3 class="text-sm font-bold mb-4 flex items-center gap-2">
+                    <span class="material-icons-round text-primary text-lg">info</span>
+                    About Bookmarks
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Bookmarks let you save posts to read later. Click the
+                    <span class="material-icons-round text-xs align-middle">bookmark_border</span>
+                    icon on any post in the feed to save it here.
+                </p>
+                <a href="feed.html"
+                    class="mt-4 flex items-center gap-2 p-3 bg-primary/10 rounded-xl text-sm font-medium text-primary hover:bg-primary/20 transition-colors">
+                    <span class="material-icons-round text-lg">dynamic_feed</span> Back to Feed
+                </a>
+            </div>
+            <div
+                class="px-4 text-[10px] text-slate-500 flex flex-wrap gap-x-4 gap-y-2 uppercase font-bold tracking-widest">
+                <a class="hover:text-primary transition-colors" href="#">About</a>
+                <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+                <a class="hover:text-primary transition-colors" href="#">Terms</a>
+                <span>© 2025 INOVOID</span>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Mobile Bottom Nav -->
+    <div
+        class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-50">
+        <a href="feed.html" class="text-slate-500"><span class="material-icons-round">home</span></a>
+        <a href="#" class="text-slate-500"><span class="material-icons-round">explore</span></a>
+        <a href="create.html"
+            class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center -translate-y-4 shadow-xl"><span
+                class="material-icons-round">add</span></a>
+        <a href="#" class="text-slate-500"><span class="material-icons-round">search</span></a>
+        <a href="profile.html" class="text-slate-500"><span class="material-icons-round">person</span></a>
+    </div>
+    <div class="lg:hidden h-20"></div>
+
+    <script src="../js/theme.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script>
+        let currentUser = null;
+
+        async function init() {
+            currentUser = await requireAuth();
+            if (!currentUser) return;
+            await updateNavAuth();
+            await loadBookmarks();
+        }
+
+        async function loadBookmarks() {
+            const container = document.getElementById('posts-container');
+            const loading = document.getElementById('posts-loading');
+            const emptyState = document.getElementById('empty-state');
+
+            const { data, error } = await fetchBookmarkedPosts(currentUser.id);
+
+            loading.classList.add('hidden');
+
+            if (error) {
+                container.innerHTML = `<div class="text-center text-red-500 py-12">Failed to load bookmarks: ${error.message}</div>`;
+                return;
+            }
+
+            // Each row has a "posts" nested object from the join
+            const posts = (data || []).map(row => row.posts).filter(Boolean);
+
+            if (posts.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            renderBookmarks(posts);
+        }
+
+        function renderBookmarks(posts) {
+            const container = document.getElementById('posts-container');
+
+            container.innerHTML = posts.map((post, i) => {
+                const author = post.profiles || {};
+                const reactionCount = post.reactions ? post.reactions.length : 0;
+                const commentCount = post.comments ? post.comments.length : 0;
+                const tags = (post.tags || []).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">#${t}</span>`).join('');
+                const hasLiked = post.reactions && post.reactions.some(r => r.user_id === currentUser.id);
+
+                return `
+                <article class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm" style="animation-delay:${i * 0.05}s">
+                    ${post.cover_image_url ? `<a href="post.html?id=${post.id}" class="block"><img class="w-full h-48 object-cover" alt="${post.title}" src="${post.cover_image_url}"/></a>` : ''}
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <img class="w-10 h-10 rounded-full object-cover" alt="${author.full_name || 'Author'}" src="${author.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(author.full_name || 'U') + '&background=137fec&color=fff'}"/>
+                                <div>
+                                    <h4 class="text-sm font-bold">${author.full_name || author.nickname || 'Anonymous'}</h4>
+                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">${author.nickname ? '@' + author.nickname + ' • ' : ''}${timeAgo(post.created_at)}</p>
+                                </div>
+                            </div>
+                            <button onclick="removeBookmark('${post.id}', this)" title="Remove bookmark" class="p-1.5 rounded-lg transition-colors text-primary bg-primary/10 hover:bg-red-50 hover:text-red-500">
+                                <span class="material-icons-round text-xl">bookmark</span>
+                            </button>
+                        </div>
+                        <h2 class="text-xl font-bold mb-3 leading-snug text-slate-900 dark:text-slate-100">${escapeHtml(post.title)}</h2>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
+                        ${tags ? `<div class="flex flex-wrap gap-1.5 mb-4">${tags}</div>` : ''}
+                        <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center gap-4">
+                                <span class="flex items-center gap-2 text-xs font-semibold text-slate-400 px-2 py-1">
+                                    <span class="material-icons-round text-lg ${hasLiked ? 'text-pink-500' : ''}">${hasLiked ? 'favorite' : 'favorite_border'}</span>
+                                    ${reactionCount}
+                                </span>
+                                <a href="comments.html#${post.id}" class="flex items-center gap-2 text-slate-500 hover:text-primary hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors text-xs font-semibold">
+                                    <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
+                                </a>
+                            </div>
+                            <a href="post.html?id=${post.id}" class="text-xs font-semibold text-slate-400 hover:text-primary transition-colors">Read →</a>
+                        </div>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        async function removeBookmark(postId, btn) {
+            if (!currentUser) return;
+            // Animate out the card
+            const article = btn.closest('article');
+            article.style.transition = 'opacity 0.3s, transform 0.3s';
+            article.style.opacity = '0';
+            article.style.transform = 'scale(0.96)';
+
+            const { error } = await toggleBookmark(postId, currentUser.id);
+
+            if (error) {
+                article.style.opacity = '1';
+                article.style.transform = '';
+                console.error('Bookmark error:', error);
+                return;
+            }
+
+            setTimeout(() => {
+                article.remove();
+                // Show empty state if no more bookmarks
+                if (document.querySelectorAll('#posts-container article').length === 0) {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                }
+            }, 300);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function stripHtml(html) {
+            if (!html) return '';
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.textContent || div.innerText || '';
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
