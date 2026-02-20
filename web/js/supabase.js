@@ -330,6 +330,24 @@ async function fetchUserBookmarks(userId) {
     return { data, error };
 }
 
+async function fetchBookmarkedPosts(userId) {
+    const { data, error } = await supabaseClient
+        .from('bookmarks')
+        .select(`
+            post_id,
+            created_at,
+            posts:post_id (
+                *,
+                profiles:author_id (id, full_name, nickname, avatar_url),
+                reactions:reactions (id, type, user_id),
+                comments:comments (id)
+            )
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+    return { data, error };
+}
+
 async function toggleBookmark(postId, userId) {
     // Check if already bookmarked
     const { data: existing } = await supabaseClient
