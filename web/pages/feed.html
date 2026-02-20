@@ -224,6 +224,7 @@
     <script>
         let allPosts = [];
         let currentUser = null;
+        let bookmarkedPostIds = new Set();
 
         // Auth guard
         async function init() {
@@ -238,7 +239,13 @@
             const loading = document.getElementById('posts-loading');
             const emptyState = document.getElementById('empty-state');
 
-            const { data: posts, error } = await fetchPublishedPosts(50);
+            const [{ data: posts, error }, { data: bookmarks }] = await Promise.all([
+                fetchPublishedPosts(50),
+                fetchUserBookmarks(currentUser.id)
+            ]);
+
+            // Build a Set of bookmarked post IDs for O(1) lookup
+            bookmarkedPostIds = new Set((bookmarks || []).map(b => b.post_id));
 
             loading.classList.add('hidden');
 
@@ -275,6 +282,7 @@
                 const tags = (post.tags || []).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">#${t}</span>`).join('');
 
                 const hasLiked = post.reactions && post.reactions.some(r => r.user_id === currentUser.id);
+                const hasBookmarked = bookmarkedPostIds.has(post.id);
 
                 return `
             <article class="animate-fade-in bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:border-primary/40 transition-colors shadow-sm" style="animation-delay:${i * 0.05}s">
@@ -288,6 +296,9 @@
                                 <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-tight">${author.nickname ? '@' + author.nickname + ' • ' : ''}${timeAgo(post.created_at)}</p>
                             </div>
                         </div>
+                        <button onclick="toggleFeedBookmark('${post.id}')" id="bm-btn-${post.id}" title="${hasBookmarked ? 'Remove bookmark' : 'Bookmark'}" class="p-1.5 rounded-lg transition-colors ${hasBookmarked ? 'text-primary bg-primary/10' : 'text-slate-400 hover:text-primary hover:bg-primary/10'}">
+                            <span class="material-icons-round text-xl" id="bm-icon-${post.id}">${hasBookmarked ? 'bookmark' : 'bookmark_border'}</span>
+                        </button>
                     </div>
                     <h2 class="text-xl font-bold mb-3 leading-snug text-slate-900 dark:text-slate-100">${escapeHtml(post.title)}</h2>
                     <p class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-3 leading-relaxed">${escapeHtml(stripHtml(post.content).substring(0, 200))}...</p>
@@ -302,7 +313,7 @@
                                 <span class="material-icons-round text-lg">chat_bubble_outline</span> ${commentCount}
                             </a>
                         </div>
-                        <!-- Read more removed as requested -->
+                        <a href="post.html?id=${post.id}" class="text-xs font-semibold text-slate-400 hover:text-primary transition-colors">Read →</a>
                     </div>
                 </div>
             </article>`;
@@ -392,6 +403,50 @@
                     btn.classList.add('text-slate-500');
                     icon.textContent = 'favorite_border';
                     countEl.textContent = currentCount;
+                }
+            }
+        }
+
+        async function toggleFeedBookmark(postId) {
+            if (!currentUser) return;
+
+            const btn = document.getElementById(`bm-btn-${postId}`);
+            const icon = document.getElementById(`bm-icon-${postId}`);
+            if (!btn || !icon) return;
+
+            const wasBookmarked = bookmarkedPostIds.has(postId);
+
+            // Optimistic update
+            if (wasBookmarked) {
+                bookmarkedPostIds.delete(postId);
+                icon.textContent = 'bookmark_border';
+                btn.className = 'p-1.5 rounded-lg transition-colors text-slate-400 hover:text-primary hover:bg-primary/10';
+                btn.title = 'Bookmark';
+            } else {
+                bookmarkedPostIds.add(postId);
+                icon.textContent = 'bookmark';
+                btn.className = 'p-1.5 rounded-lg transition-colors text-primary bg-primary/10';
+                btn.title = 'Remove bookmark';
+            }
+
+            // Animate
+            btn.classList.add('scale-110');
+            setTimeout(() => btn.classList.remove('scale-110'), 200);
+
+            const { error } = await toggleBookmark(postId, currentUser.id);
+
+            if (error) {
+                console.error('Bookmark error:', error);
+                showToast(`Error: ${error.message}`, 'error');
+                // Revert optimistic update
+                if (wasBookmarked) {
+                    bookmarkedPostIds.add(postId);
+                    icon.textContent = 'bookmark';
+                    btn.className = 'p-1.5 rounded-lg transition-colors text-primary bg-primary/10';
+                } else {
+                    bookmarkedPostIds.delete(postId);
+                    icon.textContent = 'bookmark_border';
+                    btn.className = 'p-1.5 rounded-lg transition-colors text-slate-400 hover:text-primary hover:bg-primary/10';
                 }
             }
         }
